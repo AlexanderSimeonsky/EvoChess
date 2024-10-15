@@ -2,15 +2,15 @@ import java.awt.*;
 
 /**. */
 public class Piece {
-    boolean white;
+    boolean isWhite;
     int pointValue;
     Dimension position;
     String type;
     
     
     /**. */
-    Piece(boolean white, int pointValue, Dimension position, String type) {
-        this.white = white;
+    Piece(boolean isWhite, int pointValue, Dimension position, String type) {
+        this.isWhite = isWhite;
         this.pointValue = pointValue;
         this.position = position;
         this.type = type;
