@@ -18,7 +18,9 @@ public class Temp {
         };
     }
 
-    public boolean move(int rowOrigin, int colOrigin, int rowTarget, int colTarget, boolean isWhite) {
+    //move pattern for pawn 
+    //TODO capture movement
+    public boolean validMove(int rowOrigin, int colOrigin, int rowTarget, int colTarget, boolean isWhite) {
         
 
         if (isWhite) {
