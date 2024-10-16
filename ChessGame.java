@@ -3,9 +3,13 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+//TODO game crashes when empty square is clicked
+//TODO make it so a piece can't jump over other pieces
+//TODO make it so allied pieces can't be captured
+
 public class ChessGame extends JPanel {
 
-    private JPanel chessBoardPanel; // Panel to hold the chessboard
+    public static JPanel chessBoardPanel; // Panel to hold the chessboard
     private JLabel selectedPiece = null; // Track the currently selected piece
     private JPanel previousSquare = null; // Track the square from which the piece was picked
     private final int pieceSize = 105; // Size of the chess pieces
@@ -94,14 +98,14 @@ public class ChessGame extends JPanel {
         String basePath = "sprites/"; // Path to the folder with images
 
         // Example of placing pieces: first row (black side)
-        placePiece(basePath + "Black/black-rook.png", 0, 0, new Piece(false, new Point(0, 0)));
-        placePiece(basePath + "Black/black-knight.png", 0, 1, new Piece(false, new Point(0, 1)));
-        placePiece(basePath + "Black/black-bishop.png", 0, 2, new Piece(false, new Point(0, 2)));
-        placePiece(basePath + "Black/black-queen.png", 0, 3, new Piece(false, new Point(0, 3)));
-        placePiece(basePath + "Black/black-king.png", 0, 4, new Piece(false, new Point(0, 4)));
-        placePiece(basePath + "Black/black-bishop.png", 0, 5, new Piece(false, new Point(0, 5)));
-        placePiece(basePath + "Black/black-knight.png", 0, 6, new Piece(false, new Point(0, 6)));
-        placePiece(basePath + "Black/black-rook.png", 0, 7, new Piece(false, new Point(0, 7)));
+        placePiece(basePath + "Black/black-rook.png", 0, 0, new Rook(false, new Point(0, 0)));
+        placePiece(basePath + "Black/black-knight.png", 0, 1, new Knight(false, new Point(0, 1)));
+        placePiece(basePath + "Black/black-bishop.png", 0, 2, new Bishop(false, new Point(0, 2)));
+        placePiece(basePath + "Black/black-queen.png", 0, 3, new Queen(false, new Point(0, 3)));
+        placePiece(basePath + "Black/black-king.png", 0, 4, new King(false, new Point(0, 4)));
+        placePiece(basePath + "Black/black-bishop.png", 0, 5, new Bishop(false, new Point(0, 5)));
+        placePiece(basePath + "Black/black-knight.png", 0, 6, new Knight(false, new Point(0, 6)));
+        placePiece(basePath + "Black/black-rook.png", 0, 7, new Rook(false, new Point(0, 7)));
 
         // Second row (black pawns)
         for (int col = 0; col < 8; col++) {
@@ -109,14 +113,14 @@ public class ChessGame extends JPanel {
         }
 
         // Example of placing pieces: last row (white side)
-        placePiece(basePath + "White/white-rook.png", 7, 0, new Piece(true, new Point(7, 0)));
-        placePiece(basePath + "White/white-knight.png", 7, 1, new Piece(true, new Point(7, 1)));
-        placePiece(basePath + "White/white-bishop.png", 7, 2, new Piece(true, new Point(7, 2)));
-        placePiece(basePath + "White/white-queen.png", 7, 3, new Piece(true, new Point(7, 3)));
-        placePiece(basePath + "White/white-king.png", 7, 4, new Piece(true, new Point(7, 4)));
-        placePiece(basePath + "White/white-bishop.png", 7, 5, new Piece(true, new Point(7, 5)));
-        placePiece(basePath + "White/white-knight.png", 7, 6, new Piece(true, new Point(7, 6)));
-        placePiece(basePath + "White/white-rook.png", 7, 7, new Piece(true, new Point(7, 7)));
+        placePiece(basePath + "White/white-rook.png", 7, 0, new Rook(true, new Point(7, 0)));
+        placePiece(basePath + "White/white-knight.png", 7, 1, new Knight(true, new Point(7, 1)));
+        placePiece(basePath + "White/white-bishop.png", 7, 2, new Bishop(true, new Point(7, 2)));
+        placePiece(basePath + "White/white-queen.png", 7, 3, new Queen(true, new Point(7, 3)));
+        placePiece(basePath + "White/white-king.png", 7, 4, new King(true, new Point(7, 4)));
+        placePiece(basePath + "White/white-bishop.png", 7, 5, new Bishop(true, new Point(7, 5)));
+        placePiece(basePath + "White/white-knight.png", 7, 6, new Knight(true, new Point(7, 6)));
+        placePiece(basePath + "White/white-rook.png", 7, 7, new Rook(true, new Point(7, 7)));
 
         // Seventh row (white pawns)
         for (int col = 0; col < 8; col++) {
@@ -190,6 +194,7 @@ public class ChessGame extends JPanel {
                         selectedPieceObj.location = targetPiece.location;
                     }
                 } else {
+                    // Each component in the GridLayout can be accessed by its index (row * 8 + col)
                     int index = chessBoardPanel.getComponentZOrder(clickedSquare);
                     int row = index / 8;
                     int col = index % 8;

@@ -13,15 +13,15 @@ public class Piece {
     }
 
 
-    public boolean validMove(Point location) {
+    boolean validMove(Point target) {
         return true;
     }
 
-    public boolean validCapture(Point location) {
+    boolean validCapture(Point target) {
         return true;
     }
 
-    public void move(Point target) {
+    void move(Point target) {
         location = target;
     }
 
