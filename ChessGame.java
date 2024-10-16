@@ -94,33 +94,33 @@ public class ChessGame extends JPanel {
         String basePath = "sprites/"; // Path to the folder with images
 
         // Example of placing pieces: first row (black side)
-        placePiece(basePath + "Black/black-rook.png", 0, 0);
-        placePiece(basePath + "Black/black-knight.png", 0, 1);
-        placePiece(basePath + "Black/black-bishop.png", 0, 2);
-        placePiece(basePath + "Black/black-queen.png", 0, 3);
-        placePiece(basePath + "Black/black-king.png", 0, 4);
-        placePiece(basePath + "Black/black-bishop.png", 0, 5);
-        placePiece(basePath + "Black/black-knight.png", 0, 6);
-        placePiece(basePath + "Black/black-rook.png", 0, 7);
+        placePiece(basePath + "Black/black-rook.png", 0, 0, new Piece(false, new Point(0, 0)));
+        placePiece(basePath + "Black/black-knight.png", 0, 1, new Piece(false, new Point(0, 1)));
+        placePiece(basePath + "Black/black-bishop.png", 0, 2, new Piece(false, new Point(0, 2)));
+        placePiece(basePath + "Black/black-queen.png", 0, 3, new Piece(false, new Point(0, 3)));
+        placePiece(basePath + "Black/black-king.png", 0, 4, new Piece(false, new Point(0, 4)));
+        placePiece(basePath + "Black/black-bishop.png", 0, 5, new Piece(false, new Point(0, 5)));
+        placePiece(basePath + "Black/black-knight.png", 0, 6, new Piece(false, new Point(0, 6)));
+        placePiece(basePath + "Black/black-rook.png", 0, 7, new Piece(false, new Point(0, 7)));
 
         // Second row (black pawns)
         for (int col = 0; col < 8; col++) {
-            placePiece(basePath + "Black/black-pawn.png", 1, col);
+            placePiece(basePath + "Black/black-pawn.png", 1, col, new Pawn(false, new Point(1, col)));
         }
 
         // Example of placing pieces: last row (white side)
-        placePiece(basePath + "White/white-rook.png", 7, 0);
-        placePiece(basePath + "White/white-knight.png", 7, 1);
-        placePiece(basePath + "White/white-bishop.png", 7, 2);
-        placePiece(basePath + "White/white-queen.png", 7, 3);
-        placePiece(basePath + "White/white-king.png", 7, 4);
-        placePiece(basePath + "White/white-bishop.png", 7, 5);
-        placePiece(basePath + "White/white-knight.png", 7, 6);
-        placePiece(basePath + "White/white-rook.png", 7, 7);
+        placePiece(basePath + "White/white-rook.png", 7, 0, new Piece(true, new Point(7, 0)));
+        placePiece(basePath + "White/white-knight.png", 7, 1, new Piece(true, new Point(7, 1)));
+        placePiece(basePath + "White/white-bishop.png", 7, 2, new Piece(true, new Point(7, 2)));
+        placePiece(basePath + "White/white-queen.png", 7, 3, new Piece(true, new Point(7, 3)));
+        placePiece(basePath + "White/white-king.png", 7, 4, new Piece(true, new Point(7, 4)));
+        placePiece(basePath + "White/white-bishop.png", 7, 5, new Piece(true, new Point(7, 5)));
+        placePiece(basePath + "White/white-knight.png", 7, 6, new Piece(true, new Point(7, 6)));
+        placePiece(basePath + "White/white-rook.png", 7, 7, new Piece(true, new Point(7, 7)));
 
         // Seventh row (white pawns)
         for (int col = 0; col < 8; col++) {
-            placePiece(basePath + "White/white-pawn.png", 6, col);
+            placePiece(basePath + "White/white-pawn.png", 6, col, new Pawn(true, new Point(6, col)));
         }
 
         // Revalidate and repaint to ensure pieces are rendered
@@ -129,12 +129,13 @@ public class ChessGame extends JPanel {
     }
 
     // Helper method to place a piece at a specific location on the board
-    private void placePiece(String imagePath, int row, int col) {
+    private void placePiece(String imagePath, int row, int col, Piece piece) {
         ImageIcon pieceIcon = new ImageIcon(resizeImage(new ImageIcon(imagePath).getImage(), pieceSize, pieceSize));
         JLabel pieceLabel = new JLabel(pieceIcon);
 
         // Each component in the GridLayout can be accessed by its index (row * 8 + col)
         JPanel square = (JPanel) chessBoardPanel.getComponent(row * 8 + col);
+        square.putClientProperty("piece", piece);
         square.add(pieceLabel, BorderLayout.CENTER); // Add piece to the square
     }
 
@@ -162,18 +163,63 @@ public class ChessGame extends JPanel {
 
             // If a piece is already selected, move it to the clicked square
             if (selectedPiece != null) {
-                // Remove the selected piece from the previous square
-                previousSquare.remove(selectedPiece);
-                previousSquare.revalidate();
-                previousSquare.repaint();
+                // Check if the clicked square has a piece (i.e., for capture)
+                Piece selectedPieceObj = (Piece) previousSquare.getClientProperty("piece");
+                Piece targetPiece = (Piece) clickedSquare.getClientProperty("piece");
 
-                // Remove any existing piece in the target square (capture)
-                clickedSquare.removeAll();
+                if (targetPiece != null) {
+                    // Capture logic
+                    if (selectedPieceObj.validCapture(targetPiece.location)) {
+                        clickedSquare.putClientProperty("piece", selectedPieceObj);
+                        previousSquare.putClientProperty("piece", null); 
 
-                // Add the selected piece to the new square
-                clickedSquare.add(selectedPiece, BorderLayout.CENTER);
-                clickedSquare.revalidate();
-                clickedSquare.repaint();
+                        // Remove the selected piece from the previous square
+                        previousSquare.remove(selectedPiece);
+                        previousSquare.revalidate();
+                        previousSquare.repaint();
+
+                        // Remove any existing piece in the target square (capture)
+                        clickedSquare.removeAll();
+
+                        // Add the selected piece to the new square
+                        clickedSquare.add(selectedPiece, BorderLayout.CENTER);
+                        clickedSquare.revalidate();
+                        clickedSquare.repaint();
+
+                        //update location of piece
+                        selectedPieceObj.location = targetPiece.location;
+                    }
+                } else {
+                    int index = chessBoardPanel.getComponentZOrder(clickedSquare);
+                    int row = index / 8;
+                    int col = index % 8;
+
+                    // Move logic
+                    if (selectedPieceObj.validMove(new Point(row, col))) {
+                        clickedSquare.putClientProperty("piece", selectedPieceObj);
+                        previousSquare.putClientProperty("piece", null); 
+
+                        // Remove the selected piece from the previous square
+                        previousSquare.remove(selectedPiece);
+                        previousSquare.revalidate();
+                        previousSquare.repaint();
+
+                        // Remove any existing piece in the target square (capture)
+                        clickedSquare.removeAll();
+
+                        // Add the selected piece to the new square
+                        clickedSquare.add(selectedPiece, BorderLayout.CENTER);
+                        clickedSquare.revalidate();
+                        clickedSquare.repaint();
+
+                        //update location of piece
+                        selectedPieceObj.location = new Point(row, col);
+                    }
+                }
+
+                
+
+                
 
                 // Reset selection
                 selectedPiece = null;
