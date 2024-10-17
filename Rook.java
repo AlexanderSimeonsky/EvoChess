@@ -24,7 +24,6 @@ public class Rook extends Piece {
             return false; // Invalid rook move if not in straight line
         }
 
-        // Vertical movement
         if (deltaX == 0) {
             int step = (deltaY > 0) ? 1 : -1;
             for (int i = location.y + step; i != target.y; i += step) {
@@ -33,9 +32,7 @@ public class Rook extends Piece {
                     return false; // There is a piece in the way
                 }
             }
-        }
-        // Horizontal movement
-        else if (deltaY == 0) {
+        } else if (deltaY == 0) {
             int step = (deltaX > 0) ? 1 : -1;
             for (int i = location.x + step; i != target.x; i += step) {
                 JPanel temp = (JPanel) board.getComponent((int) (i * 8 + location.getY()));

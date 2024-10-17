@@ -10,6 +10,10 @@ public class Pawn extends Piece {
 
     @Override
     public boolean validMove(Point target) {
+        if (location.equals(target)) {
+            return false; // No move if the target is the same as the current location
+        }
+        
         double deltaX = Math.signum(target.getX() - location.getX());
         double deltaY = Math.signum(target.getY() - location.getY());
 
@@ -39,12 +43,17 @@ public class Pawn extends Piece {
 
     @Override
     public boolean validCapture(Point target) {
+        
+        var board = ChessGame.chessBoardPanel;
+        JPanel temp = (JPanel) board.getComponent((int) (target.getX() * 8 + target.getY()));
 
-        if (isWhite) {
+        Piece targetPiece = (Piece) temp.getClientProperty("piece");
+
+        if (isWhite && targetPiece.isWhite != this.isWhite) {
             if (location.getX() - 1 == target.getX()) {
                 return location.getY() + 1 == target.getY() || location.getY() - 1 == target.getY();
             }
-        } else {
+        } else if (targetPiece.isWhite != this.isWhite) {
             if (location.getX() + 1 == target.getX()) {
                 return location.getY() + 1 == target.getY() || location.getY() - 1 == target.getY();
             }
