@@ -9,11 +9,19 @@ public class Knight extends Piece{
 
     @Override
     boolean validMove(Point target) {
-        return true;
+
+        int deltaX = Math.abs(target.x - location.x);
+        int deltaY = Math.abs(target.y - location.y);
+
+        if ((deltaX == 2 && deltaY == 1) || (deltaX == 1 && deltaY == 2)) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
     boolean validCapture(Point target) {
-        return true;
+        return validMove(target);
     }
 }
