@@ -3,16 +3,21 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+//TODO game crashes when empty square is clicked
+//TODO make it so a piece can't jump over other pieces
+//TODO make it so allied pieces can't be captured
+
 public class ChessGame extends JPanel {
 
-    private static JPanel chessBoardPanel; // Panel to hold the chessboard
+    public static JPanel chessBoardPanel; // Panel to hold the chessboard
     private JLabel selectedPiece = null; // Track the currently selected piece
     private JPanel previousSquare = null; // Track the square from which the piece was picked
     private final int pieceSize = 105; // Size of the chess pieces
-    public static Piece[][] board = new Piece[8][8]; // Logical board to track pieces
+    public static Piece[][] board; // 2D array to represent the board
 
     // Constructor
     public ChessGame() {
+        board = new Piece[8][8]; // Initialize the chess board
         renderChessboard();
         renderPieces();
     }
@@ -133,12 +138,11 @@ public class ChessGame extends JPanel {
         ImageIcon pieceIcon = new ImageIcon(resizeImage(new ImageIcon(imagePath).getImage(), pieceSize, pieceSize));
         JLabel pieceLabel = new JLabel(pieceIcon);
 
-        // Place the piece in both the visual board and logical board
+        // Each component in the GridLayout can be accessed by its index (row * 8 + col)
         JPanel square = (JPanel) chessBoardPanel.getComponent(row * 8 + col);
         square.putClientProperty("piece", piece);
-        square.add(pieceLabel, BorderLayout.CENTER);
-
-        board[row][col] = piece; // Store piece in the logical board
+        board[row][col] = piece; // Update the board representation
+        square.add(pieceLabel, BorderLayout.CENTER); // Add piece to the square
     }
 
     // Method to resize an image
@@ -153,10 +157,8 @@ public class ChessGame extends JPanel {
             ((JPanel) square).removeAll();
         }
 
-        // Clear logical board
-        board = new Piece[8][8];
-
         // Re-render the pieces
+        board = new Piece[8][8]; // Reset the board
         renderPieces();
     }
 
@@ -164,75 +166,76 @@ public class ChessGame extends JPanel {
     private class ChessMouseListener extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
-            JPanel clickedSquare = (JPanel) e.getSource();
+            JPanel clickedSquare = (JPanel) e.getSource(); // Get the square that was clicked
     
+            // If a piece is already selected, we want to move it to the clicked square
             if (selectedPiece != null) {
-                // Avoid double-clicking the same square to deselect
-                if (clickedSquare == previousSquare) {
-                    selectedPiece = null;
-                    previousSquare = null;
-                    return;
-                }
+                Piece selectedPieceObj = (Piece) previousSquare.getClientProperty("piece"); // Get the selected piece
     
-                // Get the piece from the previous square
-                Piece selectedPieceObj = (Piece) previousSquare.getClientProperty("piece");
+                // Ensure there is a piece to move
+                if (selectedPieceObj != null) {
+                    // Determine the target square coordinates
+                    int targetIndex = chessBoardPanel.getComponentZOrder(clickedSquare); // Get the index of the clicked square
+                    int targetRow = targetIndex / 8; // Calculate the row
+                    int targetCol = targetIndex % 8; // Calculate the column
     
-                // Check if selectedPieceObj is null
-                if (selectedPieceObj == null) {
-                    // Deselect and return if the piece is null (shouldn't happen if placed properly)
-                    selectedPiece = null;
-                    previousSquare = null;
-                    return;
-                }
+                    // Create a target point for movement
+                    Point targetPoint = new Point(targetRow, targetCol);
     
-                // Handle move or capture logic
-                Piece targetPiece = (Piece) clickedSquare.getClientProperty("piece");
-                int index = chessBoardPanel.getComponentZOrder(clickedSquare);
-                int row = index / 8;
-                int col = index % 8;
+                    // Check if the move is valid
+                    if (selectedPieceObj.validMove(targetPoint)) {
+                        // Check if the target square has a piece to capture
+                        Piece targetPiece = (Piece) clickedSquare.getClientProperty("piece");
     
-                // Capture or move
-                if (targetPiece != null) {
-                    if (selectedPieceObj.isWhite != targetPiece.isWhite && selectedPieceObj.validCapture(targetPiece.location)) {
-                        clickedSquare.removeAll(); 
-                        clickedSquare.add(selectedPiece);
-                        previousSquare.removeAll();
+                        // Move the piece to the new square
+                        clickedSquare.add(selectedPiece); // Add the piece to the new square
+                        previousSquare.removeAll(); // Clear the old square
     
-                        // Update logical board
-                        board[row][col] = board[selectedPieceObj.location.x][selectedPieceObj.location.y];
-                        board[selectedPieceObj.location.x][selectedPieceObj.location.y] = null;
+                        // Update the board representation
+                        ChessGame.board[selectedPieceObj.location.x][selectedPieceObj.location.y] = null; // Clear the old position
+                        ChessGame.board[targetRow][targetCol] = selectedPieceObj; // Set the new position
+    
+                        // Update the piece's location
+                        selectedPieceObj.move(targetPoint);
+    
+                        // Set the new piece to the square's property
+                        clickedSquare.putClientProperty("piece", selectedPieceObj); // Set the new piece in the target square
+                        previousSquare.putClientProperty("piece", null); // Clear the old square's piece in property
+    
+                        // Revalidate and repaint the chessboard
+                        previousSquare.revalidate();
+                        clickedSquare.revalidate();
+                        chessBoardPanel.revalidate();
+                        previousSquare.repaint();
+                        clickedSquare.repaint();
+    
+                        // Reset selection after the move
+                        selectedPiece = null;
+                        previousSquare = null;
+                    } else {
+                        System.out.println("Invalid Move Attempted: " + selectedPieceObj + " to " + targetPoint);
                     }
-                } else if (selectedPieceObj.validMove(new Point(row, col))) {
-                    clickedSquare.add(selectedPiece);
-                    previousSquare.removeAll();
-    
-                    // Update logical board
-                    board[row][col] = board[selectedPieceObj.location.x][selectedPieceObj.location.y];
-                    board[selectedPieceObj.location.x][selectedPieceObj.location.y] = null;
-                }
-    
-                // Reset after move
-                selectedPiece = null;
-                previousSquare = null;
-    
-                chessBoardPanel.revalidate();
-                chessBoardPanel.repaint();
-            } else {
-                // Try to select a piece from the clicked square
-                Piece clickedPiece = (Piece) clickedSquare.getClientProperty("piece");
-                if (clickedPiece != null) {
-                    selectedPiece = (JLabel) clickedSquare.getComponent(0);
-                    previousSquare = clickedSquare;
                 } else {
-                    // No piece was clicked, reset
-                    selectedPiece = null;
-                    previousSquare = null;
+                    System.out.println("No piece found on the previous square!"); // Debugging output
+                }
+            } else {
+                // If no piece is selected, select the piece from the clicked square
+                Component component = clickedSquare.getComponent(0); // Get the first component of the clicked square
+    
+                if (component instanceof JLabel) { // Ensure it's a JLabel
+                    selectedPiece = (JLabel) component; // Store the selected piece
+                    previousSquare = clickedSquare; // Track the original square
+    
+                    // Get the piece from the previous square and log its information
+                    Piece piece = (Piece) previousSquare.getClientProperty("piece");
+                    System.out.println("Selected Piece: " + piece + " from " + previousSquare);
+                } else {
+                    System.out.println("No piece clicked!"); // Debugging output
                 }
             }
         }
     }
     
-
     public static void main(String[] args) {
         new ChessGame();
     }

@@ -14,48 +14,44 @@ public class Pawn extends Piece {
             return false; // No move if the target is the same as the current location
         }
         
-        double deltaX = Math.signum(target.x - location.x);
-        double deltaY = Math.signum(target.y - location.y);
+        int deltaX = target.x - location.x;
+        int deltaY = Math.abs(target.y - location.y);
 
-        int x = (int) (location.y + deltaX);
-        int y = (int) (location.y + deltaY);
+        if (deltaY != 0) {
+            return false;
+        }
         
         if (isWhite) {
-            if (location.x == 6) {
-                Piece p = ChessGame.board[target.x][target.y];
-
-                return target.x >= location.x - 2 && target.x < location.x && p == null && target.y == location.y;
-            } else {
-                return target.x >= location.x - 1 && target.x < location.x && target.y == location.y;
+            if (location.x == 6 && deltaX == -2) {
+                return ChessGame.board[location.x - 1][location.y] == null;
             }
+
+            return deltaX == -1;
         } else {
-            if (location.x == 1) {
-                Piece p = ChessGame.board[target.x][target.y];
-
-                return target.x <= location.x + 2 && target.x > location.x && p == null && target.y == location.y;
-            } else {
-                return target.x <= location.x + 1 && target.x > location.x && target.y == location.y;
+            if (location.x == 1 && deltaX == 2) {
+                return ChessGame.board[location.x + 1][location.y] == null;
             }
+
+            return deltaX == 1;
         }
     }
 
     @Override
     public boolean validCapture(Point target) {
+        int deltaX = target.x - location.x;
+        int deltaY = Math.abs(target.y - location.y);
+
         if (isWhite) {
-            if (location.x - 1 == target.x) {
-                return location.y + 1 == target.y || location.y - 1 == target.y;
+            if (deltaX == -1 && deltaY == 1) {
+                return true;
             }
         } else {
-            if (location.x + 1 == target.getX()) {
-                return location.y + 1 == target.y || location.y - 1 == target.y;
+            if (deltaX == 1 && deltaY == 1) {
+                return true;
             }
         }
 
         return false;
-    }
-
-    public void move(Point target) {
-        location = target;
     }
 
     //TODO promotion

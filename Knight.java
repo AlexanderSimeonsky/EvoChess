@@ -9,6 +9,9 @@ public class Knight extends Piece{
 
     @Override
     boolean validMove(Point target) {
+        if (location.equals(target)) {
+            return false; // No move if the target is the same as the current location
+        }
 
         int deltaX = Math.abs(target.x - location.x);
         int deltaY = Math.abs(target.y - location.y);
@@ -22,6 +25,11 @@ public class Knight extends Piece{
 
     @Override
     boolean validCapture(Point target) {
-        return validMove(target);
+        Piece p = ChessGame.board[target.x][target.y];
+
+        if (p != null) {
+            return validMove(target);
+        }
+        return false; 
     }
 }

@@ -1,8 +1,6 @@
 import java.awt.*;
 
-import javax.swing.JPanel;
-
-public class Bishop extends Piece{
+public class Bishop extends Piece {
     int points = 3;
 
     Bishop(boolean isWhite, Point location) {
@@ -12,42 +10,44 @@ public class Bishop extends Piece{
     @Override
     boolean validMove(Point target) {
         if (location.equals(target)) {
+            System.out.println("Invalid move: Target is the same as current location");
             return false; // No move if the target is the same as the current location
         }
 
         int deltaX = target.x - location.x;
         int deltaY = target.y - location.y;
 
-        //check if on the same diagonal
+        // Check if the move is along a diagonal
         if (Math.abs(deltaX) != Math.abs(deltaY)) {
+            System.out.println("Invalid move: Not a diagonal move");
             return false;
         }
 
-        int xStep = (deltaX > 0) ? 1 : -1;
-        int yStep = (deltaY > 0) ? 1 : -1;
+        // Calculate the direction of movement
+        int xStep = Integer.signum(deltaX);
+        int yStep = Integer.signum(deltaY);
 
+        // Check all squares between the current location and the target
         int x = location.x + xStep;
         int y = location.y + yStep;
-
         while (x != target.x && y != target.y) {
             Piece p = ChessGame.board[x][y];
             if (p != null) {
+                System.out.println("Invalid move: Piece blocking the path at (" + x + ", " + y + ")");
                 return false; // There is a piece in the way
             }
             x += xStep;
             y += yStep;
         }
 
+        // If we reach here, it's a valid move
+        System.out.println("Valid move from (" + location.x + ", " + location.y + ") to (" + target.x + ", " + target.y + ")");
         return true;
     }
 
     @Override
     boolean validCapture(Point target) {
-        Piece p = ChessGame.board[target.x][target.y];
-
-        if (p != null) {
-            return validMove(target);
-        }
-        return false;
+        // Bishop can only capture on valid moves, so re-use validMove logic
+        return validMove(target);
     }
 }
