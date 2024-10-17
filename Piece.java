@@ -1,32 +1,28 @@
 import java.awt.*;
 
 /**. */
-public class Piece {
-<<<<<<< HEAD
+public class Piece {  
+
     boolean isWhite;
-=======
-    boolean white;
->>>>>>> fe65a263e997c9e5579ddf31c21cd259376f8e2e
-    int pointValue;
-    Dimension position;
-    String type;
-    
+    Point location;
     
     /**. */
-<<<<<<< HEAD
-    Piece(boolean isWhite, int pointValue, Dimension position, String type) {
+    Piece(boolean isWhite, Point location) {
         this.isWhite = isWhite;
-=======
-    Piece(boolean white, int pointValue, Dimension position, String type) {
-        this.white = white;
->>>>>>> fe65a263e997c9e5579ddf31c21cd259376f8e2e
-        this.pointValue = pointValue;
-        this.position = position;
-        this.type = type;
+        this.location = location;
     }
 
-    void move() {
-        
+
+    boolean validMove(Point target) {
+        return true;
+    }
+
+    boolean validCapture(Point target) {
+        return true;
+    }
+
+    void move(Point target) {
+        location = target;
     }
 
 }
