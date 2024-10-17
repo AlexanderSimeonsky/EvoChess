@@ -30,9 +30,8 @@ public class Bishop extends Piece{
         int y = location.y + yStep;
 
         while (x != target.x && y != target.y) {
-            var board = ChessGame.chessBoardPanel;
-            JPanel temp = (JPanel) board.getComponent(x * 8 + y);
-            if ((Piece) temp.getClientProperty("piece") != null) {
+            Piece p = ChessGame.board[x][y];
+            if (p != null) {
                 return false; // There is a piece in the way
             }
             x += xStep;
@@ -44,11 +43,9 @@ public class Bishop extends Piece{
 
     @Override
     boolean validCapture(Point target) {
-        var board = ChessGame.chessBoardPanel;
-        JPanel temp = (JPanel) board.getComponent((int) (target.getX() * 8 + target.getY()));
+        Piece p = ChessGame.board[target.x][target.y];
 
-        Piece targetPiece = (Piece) temp.getClientProperty("piece");
-        if (targetPiece != null && targetPiece.isWhite != this.isWhite) {
+        if (p != null) {
             return validMove(target);
         }
         return false;

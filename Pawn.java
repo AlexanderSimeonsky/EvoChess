@@ -14,48 +14,40 @@ public class Pawn extends Piece {
             return false; // No move if the target is the same as the current location
         }
         
-        double deltaX = Math.signum(target.getX() - location.getX());
-        double deltaY = Math.signum(target.getY() - location.getY());
+        double deltaX = Math.signum(target.x - location.x);
+        double deltaY = Math.signum(target.y - location.y);
 
-        int x = (int) (location.getX() + deltaX);
-        int y = (int) (location.getY() + deltaY);
+        int x = (int) (location.y + deltaX);
+        int y = (int) (location.y + deltaY);
         
         if (isWhite) {
-            if (location.getX() == 6) {
-                JPanel c = (JPanel) ChessGame.chessBoardPanel.getComponent(x * 8 + y);
-                Piece p = (Piece) c.getClientProperty("piece");
+            if (location.x == 6) {
+                Piece p = ChessGame.board[target.x][target.y];
 
-                return target.getX() >= location.getX() - 2 && target.getX() < location.getX() && p == null;
+                return target.x >= location.x - 2 && target.x < location.x && p == null && target.y == location.y;
             } else {
-                return target.getX() >= location.getX() - 1 && target.getX() < location.getX();
+                return target.x >= location.x - 1 && target.x < location.x && target.y == location.y;
             }
         } else {
-            if (location.getX() == 1) {
-                JPanel c = (JPanel) ChessGame.chessBoardPanel.getComponent(x * 8 + y);
-                Piece p = (Piece) c.getClientProperty("piece");
+            if (location.x == 1) {
+                Piece p = ChessGame.board[target.x][target.y];
 
-                return target.getX() <= location.getX() + 2 && target.getX() > location.getX() && p == null;
+                return target.x <= location.x + 2 && target.x > location.x && p == null && target.y == location.y;
             } else {
-                return target.getX() <= location.getX() + 1 && target.getX() > location.getX();
+                return target.x <= location.x + 1 && target.x > location.x && target.y == location.y;
             }
         }
     }
 
     @Override
     public boolean validCapture(Point target) {
-        
-        var board = ChessGame.chessBoardPanel;
-        JPanel temp = (JPanel) board.getComponent((int) (target.getX() * 8 + target.getY()));
-
-        Piece targetPiece = (Piece) temp.getClientProperty("piece");
-
-        if (isWhite && targetPiece.isWhite != this.isWhite) {
-            if (location.getX() - 1 == target.getX()) {
-                return location.getY() + 1 == target.getY() || location.getY() - 1 == target.getY();
+        if (isWhite) {
+            if (location.x - 1 == target.x) {
+                return location.y + 1 == target.y || location.y - 1 == target.y;
             }
-        } else if (targetPiece.isWhite != this.isWhite) {
-            if (location.getX() + 1 == target.getX()) {
-                return location.getY() + 1 == target.getY() || location.getY() - 1 == target.getY();
+        } else {
+            if (location.x + 1 == target.getX()) {
+                return location.y + 1 == target.y || location.y - 1 == target.y;
             }
         }
 
