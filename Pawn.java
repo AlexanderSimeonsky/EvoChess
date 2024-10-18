@@ -38,6 +38,10 @@ public class Pawn extends Piece {
 
     @Override
     public boolean validCapture(Point target) {
+        if (location.equals(target)) {
+            return false; // No move if the target is the same as the current location
+        }
+        
         int deltaX = target.x - location.x;
         int deltaY = Math.abs(target.y - location.y);
 

@@ -23,11 +23,10 @@ public class King extends Piece{
 
     @Override
     boolean validCapture(Point target) {
-        Piece p = ChessGame.board[target.x][target.y];
-
-        if (p != null) {
-            return validMove(target);
+        if (location.equals(target)) {
+            return false; // No move if the target is the same as the current location
         }
-        return false; 
+        
+        return validMove(target);
     }
 }
