@@ -9,6 +9,7 @@ public class ChessGame {
     private JPanel previousSquare = null;  
     private int pieceSize = 105;
     public static Piece[][] board; //logical board
+    public static int turnCounter = 0;
 
     public ChessGame() {
         board = new Piece[8][8];
@@ -195,6 +196,7 @@ public class ChessGame {
                                 System.out.println("// Reset selection after the move");
                                 selectedPiece = null;
                                 previousSquare = null;
+                                turnCounter++;
                             }
                         } else {
                             //if it is the same colour then deselect the pieces
@@ -240,6 +242,7 @@ public class ChessGame {
                             System.out.println("// Reset selection after the move");
                             selectedPiece = null;
                             previousSquare = null;
+                            turnCounter++;
                         } else {
                             //if it is not valid then deselect it and the square
                             System.out.println("//if it is not valid then deselect it and the square");
