@@ -4,11 +4,11 @@ import java.awt.event.MouseEvent;
 import javax.swing.*;
 
 public class ChessGame {
-    public static JPanel chessBoardPanel;
+    public static JPanel chessBoardPanel; //visual board
     private Piece selectedPiece = null;
-    private JPanel previousSquare = null;
+    private JPanel previousSquare = null;  
     private int pieceSize = 105;
-    public static Piece[][] board;
+    public static Piece[][] board; //logical board
 
     public ChessGame() {
         board = new Piece[8][8];

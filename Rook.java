@@ -3,6 +3,7 @@ import javax.swing.*;
 
 public class Rook extends Piece {
     int points = 5;
+    boolean hasMoved = false;
 
     Rook(boolean isWhite, Point location) {
         super(isWhite, location);
@@ -18,6 +19,7 @@ public class Rook extends Piece {
         if (target.x == location.x || target.y == location.y) {
             System.out.println("Check if there is blocking piece");
             if (!PieceIsOnStraightLine(target)) {
+                hasMoved = true;
                 return true;
             }
         }

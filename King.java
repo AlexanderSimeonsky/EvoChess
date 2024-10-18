@@ -1,8 +1,9 @@
 import java.awt.*;
+import javax.swing.*;
 
 public class King extends Piece{
     int points = 0;
-    boolean didCastle = true;
+    boolean hasMoved = false;
 
     King(boolean isWhite, Point location) {
         super(isWhite, location);
@@ -14,11 +15,23 @@ public class King extends Piece{
             return false; // No move if the target is the same as the current location
         }
 
+        if (!hasMoved && Math.abs(target.y - location.y) == 2) {
+            if (castle(target)) {
+                System.out.println("valid castle");
+                return true;
+            }
+        }
+
         int deltaX = Math.abs(target.x - location.x);
         int deltaY = Math.abs(target.y - location.y);
 
         // Check if the move is one square away in any direction
-        return (deltaX <= 1 && deltaY <= 1 && (deltaX + deltaY) > 0);
+        if ((deltaX <= 1 && deltaY <= 1 && (deltaX + deltaY) > 0)) {
+            hasMoved = true;
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -28,5 +41,99 @@ public class King extends Piece{
         }
         
         return validMove(target);
+    }
+
+    boolean castle(Point target) {
+        Piece p;
+        boolean rookIsLeftOfKing;
+
+        if (target.y < location.y) {
+            //castle left
+            if (isWhite) {
+                p = ChessGame.board[7][0];
+            } else {
+                p = ChessGame.board[0][0];
+            }
+            rookIsLeftOfKing = true;
+        } else {
+            //caslte right
+            if (isWhite) {
+                p = ChessGame.board[7][7];
+            } else {
+                p = ChessGame.board[0][7];
+            }
+            rookIsLeftOfKing = false;
+        }
+
+        if (p instanceof Rook) {
+            Rook r = (Rook) p;
+            if (!r.hasMoved) {
+                JPanel temp = ChessGame.chessBoardPanel;
+                JPanel rOrigin;
+                JPanel rTarget;
+
+                //if piece at corner is rook and hasnt moved then check if piece is blocking
+                if (!PieceIsOnStraightLine(target)) {
+                    //if no errors check if rook is left of king
+                    if (rookIsLeftOfKing) {
+                        //move three squares right
+                        rOrigin = (JPanel) temp.getComponent(r.location.x * 8 + r.location.y);
+                        rTarget = (JPanel) temp.getComponent(r.location.x * 8 + r.location.y + 3);
+
+                        //move rook to new square
+                        rTarget.putClientProperty("piece", r);
+                        rTarget.add(rOrigin.getComponent(0));
+                        ChessGame.board[r.location.x][r.location.y + 3] = r;
+                        r.move(new Point(r.location.x, r.location.y + 3));
+
+                        //remove it from previous square
+                        rOrigin.removeAll();
+                        rOrigin.putClientProperty("piece", null);
+                        ChessGame.board[r.location.x][r.location.y] = null;
+
+                        //revalidate and repaint
+                        rOrigin.revalidate();
+                        rTarget.revalidate();
+                        ChessGame.chessBoardPanel.revalidate();
+                        rOrigin.repaint();
+                        rTarget.repaint();
+                    } else {
+                        //move two squares left
+                        rOrigin = (JPanel) temp.getComponent(r.location.x * 8 + r.location.y);
+                        rTarget = (JPanel) temp.getComponent(r.location.x * 8 + r.location.y - 2);
+
+                        //move rook to new square
+                        rTarget.putClientProperty("piece", r);
+                        rTarget.add(rOrigin.getComponent(0));
+                        ChessGame.board[r.location.x][r.location.y - 2] = r;
+                        r.move(new Point(r.location.x, r.location.y - 2));
+
+                        //remove it from previous square
+                        rOrigin.removeAll();
+                        rOrigin.putClientProperty("piece", null);
+                        ChessGame.board[r.location.x][r.location.y] = null;
+
+                        //revalidate and repaint
+                        rOrigin.revalidate();
+                        rTarget.revalidate();
+                        ChessGame.chessBoardPanel.revalidate();
+                        rOrigin.repaint();
+                        rTarget.repaint();
+                    }
+
+
+                    return true;
+                } else {
+                    System.out.println("Invalid castle piece blocking");
+                    return false;
+                }
+            } else {
+                System.out.println("Invalid castle rook has moved");
+                return false;
+            }
+        } else {
+            System.out.println("Invalid castle corner piece is not a rook");
+            return false;
+        }
     }
 }
