@@ -1,5 +1,8 @@
-import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
+import javax.swing.*;
 
 public class Pawn extends Piece {
     int points = 1;
@@ -13,6 +16,12 @@ public class Pawn extends Piece {
     public boolean validMove(Point target) {
         if (location.equals(target)) {
             return false; // No move if the target is the same as the current location
+        }
+
+        if (isWhite && target.x == 0) {
+            promotion();
+        } else if (!isWhite && target.x == 7) {
+            promotion();
         }
 
         if (enPassant(target)) {
@@ -59,10 +68,16 @@ public class Pawn extends Piece {
 
         if (isWhite) {
             if (deltaX == -1 && deltaY == 1) {
+                if (target.x == 0) {
+                    promotion();
+                }
                 return true;
             }
         } else {
             if (deltaX == 1 && deltaY == 1) {
+                if (target.x == 7) {
+                    promotion();
+                }
                 return true;
             }
         }
@@ -163,8 +178,82 @@ public class Pawn extends Piece {
         return false;
     }
 
-    public boolean promotion(Point target) {
+    public void promotion() {
+        // Create the promotion panel
+        JPanel promotionPanel = new JPanel();
+        promotionPanel.setLayout(new GridLayout(4, 1));
+        promotionPanel.setBounds(ChessGame.frame.getWidth() - 150, 150, 220, 300);
+        promotionPanel.setBackground(new Color(149, 69, 53));
+    
+        // Define promotion options
+        String[] promotionOptions = {"Bishop", "Knight", "Rook", "Queen"};
+        String[] pieceNames;
+    
+        // Determine piece names based on the color of the pawn
+        if (isWhite) {
+            pieceNames = new String[]{"white-bishop", "white-knight", "white-rook", "white-queen"};
+        } else {
+            pieceNames = new String[]{"black-bishop", "black-knight", "black-rook", "black-queen"};
+        }
+    
+        // Create buttons for each promotion option
+        for (int i = 0; i < 4; i++) {
+            final int index = i;  // Declare a final variable to capture the current value of i
+            JButton button = new JButton(promotionOptions[i]);
+            button.setBackground(new Color(200, 200, 200)); // Light grey background
+            button.setForeground(Color.BLACK); // Black text
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    promotePawn(pieceNames[index]); // Use the final variable here
+                    // Close the promotion panel after selection
+                    promotionPanel.setVisible(false);
+                    ChessGame.frame.remove(promotionPanel);
+                    ChessGame.frame.revalidate();
+                    ChessGame.frame.repaint();
+                }
+            });
+            promotionPanel.add(button);
+        }
+    
+        // Add the promotion panel to the game frame
+        ChessGame.frame.add(promotionPanel);
+        ChessGame.frame.setVisible(true); // Ensure the frame is visible
+    }
+    
+    
 
-        return false;
+    public void promotePawn(String pieceName) {
+        // Get the new piece type based on the selected option
+        Piece newPiece;
+        if (pieceName.equals("white-bishop")) {
+            newPiece = new Bishop(true, location); // Assuming you have a Bishop class
+        } else if (pieceName.equals("white-knight")) {
+            newPiece = new Knight(true, location); // Assuming you have a Knight class
+        } else if (pieceName.equals("white-rook")) {
+            newPiece = new Rook(true, location); // Assuming you have a Rook class
+        } else {
+            newPiece = new Queen(true, location); // Assuming you have a Queen class
+        }
+    
+        // Update the chess board and remove the pawn
+        ChessGame.board[location.x][location.y] = newPiece;
+    
+        // Update the GUI to reflect the new piece
+        JPanel temp = ChessGame.chessBoardPanel;
+        JPanel square = (JPanel) temp.getComponent(location.x * 8 + location.y);
+        square.removeAll();
+        // Add the new piece representation to the square
+        square.putClientProperty("piece", newPiece); // Set the new piece's client property
+        // Add the new piece's graphic representation, for example:
+        JLabel pieceLabel = new JLabel(new ImageIcon("sprites/White/" + pieceName + ".png"));
+        square.add(pieceLabel);
+        
+        // Revalidate and repaint the square
+        square.revalidate();
+        square.repaint();
+    
+        // Optionally, reset the location of the new piece
+        newPiece.location = location; // Assuming there's a method to set location if needed
     }
 }

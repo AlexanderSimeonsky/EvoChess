@@ -4,6 +4,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.*;
 
 public class ChessGame {
+    public static JFrame frame;
     public static JPanel chessBoardPanel; //visual board
     private Piece selectedPiece = null;
     private JPanel previousSquare = null;  
@@ -22,7 +23,7 @@ public class ChessGame {
         Color black = new Color(50, 50, 50);
         Color white = new Color(200, 200, 200);
 
-        JFrame frame = new JFrame();
+        frame = new JFrame();
         frame.setUndecorated(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setBackground(brown);
@@ -121,7 +122,7 @@ public class ChessGame {
         square.add(pieceLabel, BorderLayout.CENTER);
     }
 
-    private Image resizeImage(Image originalImage, int width, int height) {
+    public static Image resizeImage(Image originalImage, int width, int height) {
         return originalImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
     }
 
@@ -134,7 +135,7 @@ public class ChessGame {
         }
     }
 
-    private class ChessMouseListener extends MouseAdapter {
+    public class ChessMouseListener extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
             JPanel clickedSquare = (JPanel) e.getSource();
