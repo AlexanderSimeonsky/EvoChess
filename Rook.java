@@ -10,50 +10,29 @@ public class Rook extends Piece {
 
     @Override
     boolean validMove(Point target) {
-        var board = ChessGame.chessBoardPanel;
 
         if (location.equals(target)) {
             return false; // No move if the target is the same as the current location
         }
 
-        int deltaX = target.x - location.x;
-        int deltaY = target.y - location.y;
-
-        // Rook moves either vertically or horizontally
-        if (deltaX != 0 && deltaY != 0) {
-            return false; // Invalid rook move if not in straight line
-        }
-
-        if (deltaX == 0) {
-            int step = (deltaY > 0) ? 1 : -1;
-            for (int i = location.y + step; i != target.y; i += step) {
-                JPanel temp = (JPanel) board.getComponent((int) (location.getX() * 8 + i));
-                if ((Piece) temp.getClientProperty("piece") != null) {
-                    return false; // There is a piece in the way
-                }
-            }
-        } else if (deltaY == 0) {
-            int step = (deltaX > 0) ? 1 : -1;
-            for (int i = location.x + step; i != target.x; i += step) {
-                JPanel temp = (JPanel) board.getComponent((int) (i * 8 + location.getY()));
-                if ((Piece) temp.getClientProperty("piece") != null) {
-                    return false; // There is a piece in the way
-                }
+        if (target.x == location.x || target.y == location.y) {
+            System.out.println("Check if there is blocking piece");
+            if (!PieceIsOnStraightLine(target)) {
+                return true;
             }
         }
 
-        return true; // Move is valid if no obstacles found
+        System.out.println("Invalid move");
+        return false;
     }
 
     @Override
     boolean validCapture(Point target) {
-        var board = ChessGame.chessBoardPanel;
-        JPanel temp = (JPanel) board.getComponent((int) (target.getX() * 8 + target.getY()));
-
-        Piece targetPiece = (Piece) temp.getClientProperty("piece");
-        if (targetPiece != null && targetPiece.isWhite != this.isWhite) {
-            return validMove(target);
+        if (location.equals(target)) {
+            System.out.println("invalid move");
+            return false; // No move if the target is the same as the current location
         }
-        return false;
+        
+        return validMove(target);
     }
 }
