@@ -180,9 +180,10 @@ public class Pawn extends Piece {
 
     public void promotion() {
         // Create the promotion panel
+        String colour = "";
         JPanel promotionPanel = new JPanel();
         promotionPanel.setLayout(new GridLayout(4, 1));
-        promotionPanel.setBounds(ChessGame.frame.getWidth() - 150, 150, 220, 300);
+        promotionPanel.setBounds(ChessGame.frame.getWidth() - 150, 150, 100, 400);
         promotionPanel.setBackground(new Color(149, 69, 53));
     
         // Define promotion options
@@ -192,16 +193,24 @@ public class Pawn extends Piece {
         // Determine piece names based on the color of the pawn
         if (isWhite) {
             pieceNames = new String[]{"white-bishop", "white-knight", "white-rook", "white-queen"};
+            colour = "White";
         } else {
             pieceNames = new String[]{"black-bishop", "black-knight", "black-rook", "black-queen"};
+            colour = "Black";
         }
     
         // Create buttons for each promotion option
         for (int i = 0; i < 4; i++) {
-            final int index = i;  // Declare a final variable to capture the current value of i
-            JButton button = new JButton(promotionOptions[i]);
+            int index = i;  // Declare a final variable to capture the current value of i
+            JButton button = new JButton();
             button.setBackground(new Color(200, 200, 200)); // Light grey background
             button.setForeground(Color.BLACK); // Black text
+            ImageIcon icon = new ImageIcon("sprites/" + colour + "/" + pieceNames[i] + ".png");
+            Image img = icon.getImage();
+            icon = new ImageIcon(img.getScaledInstance(105, 105, Image.SCALE_SMOOTH));
+            button.setIcon(icon);
+            button.setPreferredSize(new Dimension(90, 90));
+            button.setHorizontalAlignment(SwingConstants.CENTER);
             button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -224,36 +233,42 @@ public class Pawn extends Piece {
     
 
     public void promotePawn(String pieceName) {
-        // Get the new piece type based on the selected option
+        String colour = "";
+        if (isWhite) {
+            colour = "White";
+        } else {
+            colour = "Black";
+        }
+
         Piece newPiece;
         if (pieceName.equals("white-bishop")) {
-            newPiece = new Bishop(true, location); // Assuming you have a Bishop class
+            newPiece = new Bishop(true, location);
         } else if (pieceName.equals("white-knight")) {
-            newPiece = new Knight(true, location); // Assuming you have a Knight class
+            newPiece = new Knight(true, location);
         } else if (pieceName.equals("white-rook")) {
-            newPiece = new Rook(true, location); // Assuming you have a Rook class
+            newPiece = new Rook(true, location);
         } else {
-            newPiece = new Queen(true, location); // Assuming you have a Queen class
+            newPiece = new Queen(true, location);
         }
     
         // Update the chess board and remove the pawn
         ChessGame.board[location.x][location.y] = newPiece;
     
-        // Update the GUI to reflect the new piece
+        // Update the board to reflect the new piece
         JPanel temp = ChessGame.chessBoardPanel;
         JPanel square = (JPanel) temp.getComponent(location.x * 8 + location.y);
         square.removeAll();
-        // Add the new piece representation to the square
-        square.putClientProperty("piece", newPiece); // Set the new piece's client property
-        // Add the new piece's graphic representation, for example:
-        JLabel pieceLabel = new JLabel(new ImageIcon("sprites/White/" + pieceName + ".png"));
+        square.putClientProperty("piece", newPiece);
+        ImageIcon icon = new ImageIcon("sprites/" + colour + "/" + pieceName + ".png");
+        Image img = icon.getImage();
+        icon = new ImageIcon(img.getScaledInstance(105, 105, Image.SCALE_SMOOTH));
+
+        JLabel pieceLabel = new JLabel(icon);
         square.add(pieceLabel);
         
         // Revalidate and repaint the square
         square.revalidate();
         square.repaint();
-    
-        // Optionally, reset the location of the new piece
-        newPiece.location = location; // Assuming there's a method to set location if needed
+        newPiece.location = location;
     }
 }
