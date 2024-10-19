@@ -343,11 +343,9 @@ public class ChessGame {
             if (selectedPiece.isWhite) {
                 kingPoint = whiteKingLocation;
                 king = (King) board[kingPoint.x][kingPoint.y];
-                System.out.println("Checking for white king at: " + kingPoint);
             } else {
                 kingPoint = blackKingLocation;
                 king = (King) board[kingPoint.x][kingPoint.y];
-                System.out.println("Checking for black king at: " + kingPoint);
             }
 
             //check if moving piece is a king
@@ -357,38 +355,37 @@ public class ChessGame {
             }
     
             // Check if any piece can attack the king
-            boolean isInCheck = false;
-            System.out.println("Checking for pieces attacking the king...");
-            for (Piece[] pieces : board) {
-                for (Piece p : pieces) {
-                    if (p != null && p.isWhite != king.isWhite) {
-                        System.out.println("Checking piece at: " + p.location + " (isWhite: " + p.isWhite + ")");
-                        if (p.validCapture(king.location)) {
-                            isInCheck = true; // The king is in check
-                            System.out.println("King is in check from piece at: " + p.location);
-                            break;
-                        }
-                    }
-                }
-                if (isInCheck) {
-                    break;
-                }
-            }
+            boolean check = king.isInCheck();
     
             // Revert the move
             board[target.x][target.y] = targetP;
             board[spLocation.x][spLocation.y] = selectedPiece;
             selectedPiece.location = spLocation;
     
-            // Log the result of the check
-            if (isInCheck) {
-                System.out.println("Illegal move: The king is in check after moving to " + target);
-            } else {
-                System.out.println("Legal move: The king is safe after moving to " + target);
-            }
-    
             // Return true if the king is in check
-            return isInCheck;
+            return check;
+        }
+
+        public boolean checkMate() {
+            //get the location of the king
+            Point kingPoint;
+            King king;
+            if (selectedPiece.isWhite) {
+                kingPoint = whiteKingLocation;
+                king = (King) board[kingPoint.x][kingPoint.y];
+            } else {
+                kingPoint = blackKingLocation;
+                king = (King) board[kingPoint.x][kingPoint.y];
+            }
+
+            //check if there is an active check
+            if (king.isInCheck()) {
+                //if yes check for possible moves
+
+                
+            }
+
+            return false;
         }
     }
     

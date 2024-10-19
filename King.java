@@ -167,4 +167,23 @@ public class King extends Piece{
             return false;
         }
     }
+
+    public boolean isInCheck() {
+        boolean check = false;
+        for (Piece[] pieces : ChessGame.board) {
+            for (Piece p : pieces) {
+                if (p != null && p.isWhite != isWhite) {
+                    if (p.validCapture(location)) {
+                        check = true; // The king is in check
+                        break;
+                    }
+                }
+            }
+            if (check) {
+                break;
+            }
+        }
+
+        return check;
+    }
 }
