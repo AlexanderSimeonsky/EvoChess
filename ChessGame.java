@@ -3,6 +3,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
 
+/**
+ * Class to handle the game flow.
+ */
 public class ChessGame {
     public static JFrame frame;
     public static JPanel chessBoardPanel; //visual board
@@ -11,7 +14,14 @@ public class ChessGame {
     private int pieceSize = 105;
     public static Piece[][] board; //logical board
     public static int turnCounter = 0;
+    public static boolean isWhiteTurn = true; 
+    private JLabel turnLabel;
+    public static Point whiteKingLocation; //track position of kings
+    public static Point blackKingLocation;
 
+    /**
+     * Constructor that begins the game flow.
+     */
     public ChessGame() {
         board = new Piece[8][8];
         renderChessboard();
@@ -77,6 +87,14 @@ public class ChessGame {
             }
         });
 
+        turnLabel = new JLabel(isWhiteTurn ? "White's turn" : "Black's turn");
+        turnLabel.setForeground(isWhiteTurn ? white : black);
+        turnLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        turnLabel.setBounds(50, 50, 250, 100);
+        turnLabel.setBackground(white);
+        frame.add(turnLabel);
+
+
         frame.dispatchEvent(new java.awt.event.ComponentEvent(frame, java.awt.event.ComponentEvent.COMPONENT_RESIZED));
         frame.setVisible(true);
     }
@@ -107,6 +125,10 @@ public class ChessGame {
         for (int col = 0; col < 8; col++) {
             placePiece("sprites/White/white-pawn.png", 6, col, new Pawn(true, new Point(6, col)));
         }
+
+        //store location of kings
+        whiteKingLocation = new Point(7, 4);
+        blackKingLocation = new Point(0, 4);
 
         chessBoardPanel.revalidate();
         chessBoardPanel.repaint();
@@ -154,6 +176,10 @@ public class ChessGame {
                     if (clickedSquare.getClientProperty("piece") != null) {
                         //if there is a piece store it
                         System.out.println("//if there is a piece store it");
+                        int pieceIndex = chessBoardPanel.getComponentZOrder(clickedSquare);
+                        int pieceRow = pieceIndex / 8;
+                        int pieceCol = pieceIndex % 8;
+                        //Piece p = board[pieceRow][pieceCol];
                         Piece p = (Piece) clickedSquare.getClientProperty("piece");
 
                         //check the colour
@@ -162,7 +188,8 @@ public class ChessGame {
                             //if it is not the same colour check for valid capture
                             System.out.println("//if it is not the same colour check for valid capture");
 
-                            if (selectedPiece.validCapture(new Point(p.location.x, p.location.y))) {
+                            Point point = new Point(p.location.x, p.location.y);
+                            if (selectedPiece.validCapture(point) && !illegalMove(point, selectedPiece)) {
 
                                 //if capture is valid then capture
                                 System.out.println("//if capture is valid then capture");
@@ -198,6 +225,11 @@ public class ChessGame {
                                 selectedPiece = null;
                                 previousSquare = null;
                                 turnCounter++;
+
+                                //change piece turn
+                                isWhiteTurn = !isWhiteTurn;
+                                turnLabel.setText(isWhiteTurn ? "White's turn" : "Black's turn");
+
                             }
                         } else {
                             //if it is the same colour then deselect the pieces
@@ -214,7 +246,8 @@ public class ChessGame {
                         int targetRow = targetIndex / 8;
                         int targetCol = targetIndex % 8; 
 
-                        if (selectedPiece.validMove(new Point(targetRow, targetCol))) {
+                        Point point = new Point(targetRow, targetCol);
+                        if (selectedPiece.validMove(point) && !illegalMove(point, selectedPiece)) {
                             //if it is a valid move then move the piece
                             System.out.println("//if it is a valid move then move the piece");
 
@@ -244,6 +277,11 @@ public class ChessGame {
                             selectedPiece = null;
                             previousSquare = null;
                             turnCounter++;
+
+                            //change piece turn
+                            isWhiteTurn = !isWhiteTurn;
+                            turnLabel.setText(isWhiteTurn ? "White's turn" : "Black's turn");
+
                         } else {
                             //if it is not valid then deselect it and the square
                             System.out.println("//if it is not valid then deselect it and the square");
@@ -259,8 +297,21 @@ public class ChessGame {
                 //2if location has a piece select it and store its location
                 System.out.println("//2if location has a piece select it and store its location");
                 if ((Piece) clickedSquare.getClientProperty("piece") != null) {
+                    int pieceIndex = chessBoardPanel.getComponentZOrder(clickedSquare);
+                    int pieceRow = pieceIndex / 8;
+                    int pieceCol = pieceIndex % 8; 
                     selectedPiece = (Piece) clickedSquare.getClientProperty("piece");
+                    //selectedPiece = board[pieceRow][pieceCol];
                     previousSquare = clickedSquare;
+
+                    //check whos turn it is
+                    if (isWhiteTurn && !selectedPiece.isWhite) {
+                        selectedPiece = null;
+                        previousSquare = null;
+                    } else if (!isWhiteTurn && selectedPiece.isWhite) {
+                        selectedPiece = null;
+                        previousSquare = null;
+                    }
                 }
                 
             }
@@ -268,6 +319,71 @@ public class ChessGame {
             System.out.println();
             System.out.println("end");
             System.out.println();
+        }
+
+        /**
+        * Method to check if the move is illegal.
+        * @param target needed to simulate the move
+        * @return returns if the move is illegal
+        */
+        public boolean illegalMove(Point target, Piece selectedPiece) { //issue of this method is that the board is not 
+                                                //updating properly it seems that the board from the previous turn is used
+                                                
+            // Store the current locations of the pieces
+            Piece targetP = board[target.x][target.y];
+            Point spLocation = selectedPiece.location;
+    
+            // Move the piece temporarily
+            board[target.x][target.y] = selectedPiece;
+            board[selectedPiece.location.x][selectedPiece.location.y] = null;
+            selectedPiece.location = target;
+    
+            // Fetch the location of the king
+            Point kingPoint;
+            King king;
+            if (selectedPiece.isWhite) {
+                kingPoint = whiteKingLocation;
+                king = (King) board[kingPoint.x][kingPoint.y];
+                System.out.println("Checking for white king at: " + kingPoint);
+            } else {
+                kingPoint = blackKingLocation;
+                king = (King) board[kingPoint.x][kingPoint.y];
+                System.out.println("Checking for black king at: " + kingPoint);
+            }
+    
+            // Check if any piece can attack the king
+            boolean isInCheck = false;
+            System.out.println("Checking for pieces attacking the king...");
+            for (Piece[] pieces : board) {
+                for (Piece p : pieces) {
+                    if (p != null && p.isWhite != king.isWhite) {
+                        System.out.println("Checking piece at: " + p.location + " (isWhite: " + p.isWhite + ")");
+                        if (p.validCapture(king.location)) {
+                            isInCheck = true; // The king is in check
+                            System.out.println("King is in check from piece at: " + p.location);
+                            break;
+                        }
+                    }
+                }
+                if (isInCheck) {
+                    break;
+                }
+            }
+    
+            // Revert the move
+            board[target.x][target.y] = targetP;
+            board[spLocation.x][spLocation.y] = selectedPiece;
+            selectedPiece.location = spLocation;
+    
+            // Log the result of the check
+            if (isInCheck) {
+                System.out.println("Illegal move: The king is in check after moving to " + target);
+            } else {
+                System.out.println("Legal move: The king is safe after moving to " + target);
+            }
+    
+            // Return true if the king is in check
+            return isInCheck;
         }
     }
     

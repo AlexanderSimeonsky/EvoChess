@@ -1,5 +1,8 @@
 import java.awt.*;
 
+/**
+ * Class to handle the behaviour of bishops.
+ */
 public class Bishop extends Piece {
     int points = 3;
 
@@ -10,17 +13,17 @@ public class Bishop extends Piece {
     @Override
     boolean validMove(Point target) {
         if (location.equals(target)) {
-            System.out.println("Invalid move: Target is the same as current location");
+            //System.out.println("Invalid move: Target is the same as current location");
             return false; // No move if the target is the same as the current location
         }
 
         if (Math.abs(target.y - location.y) == Math.abs(target.x - location.x)) {
-            if (!PieceIsOnDiagonalLine(target)) {
+            if (!pieceIsOnDiagonalLine(target)) {
                 return true;
             }
         }
 
-        System.out.println("Invalid move");
+        //System.out.println("Invalid move");
         return false;
     }
 

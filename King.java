@@ -1,6 +1,9 @@
 import java.awt.*;
 import javax.swing.*;
 
+/**
+ * Pawn class to handle the behaviour of kings.
+ */
 public class King extends Piece{
     int points = 0;
     boolean hasMoved = false;
@@ -17,7 +20,7 @@ public class King extends Piece{
 
         if (!hasMoved && Math.abs(target.y - location.y) == 2) {
             if (castle(target)) {
-                System.out.println("valid castle");
+                //System.out.println("valid castle");
                 return true;
             }
         }
@@ -28,6 +31,14 @@ public class King extends Piece{
         // Check if the move is one square away in any direction
         if ((deltaX <= 1 && deltaY <= 1 && (deltaX + deltaY) > 0)) {
             hasMoved = true;
+
+            //update king location
+            if (isWhite) {
+                ChessGame.whiteKingLocation = this.location;
+            } else {
+                ChessGame.blackKingLocation = this.location;
+            }
+            
             return true;
         }
 
@@ -43,7 +54,13 @@ public class King extends Piece{
         return validMove(target);
     }
 
-    boolean castle(Point target) {
+    /**
+     * Method to handle the special move of castling.
+     * @param target the squre the piece wants to move to
+     * @return returns if the move is valid
+     */
+    boolean castle(Point target) { //doesnt take into consideration if those squares are pointed/targeted at 
+                                    //by like a bishop or queen
         Piece p;
         boolean rookIsLeftOfKing;
 
@@ -73,7 +90,7 @@ public class King extends Piece{
                 JPanel rTarget;
 
                 //if piece at corner is rook and hasnt moved then check if piece is blocking
-                if (!PieceIsOnStraightLine(target)) {
+                if (!pieceIsOnStraightLine(target)) {
                     //if no errors check if rook is left of king
                     if (rookIsLeftOfKing) {
                         //move three squares right
@@ -90,6 +107,13 @@ public class King extends Piece{
                         rOrigin.removeAll();
                         rOrigin.putClientProperty("piece", null);
                         ChessGame.board[r.location.x][r.location.y] = null;
+
+                        //update king location
+                        if (isWhite) {
+                            ChessGame.whiteKingLocation = this.location;
+                        } else {
+                            ChessGame.blackKingLocation = this.location;
+                        }
 
                         //revalidate and repaint
                         rOrigin.revalidate();
@@ -113,6 +137,13 @@ public class King extends Piece{
                         rOrigin.putClientProperty("piece", null);
                         ChessGame.board[r.location.x][r.location.y] = null;
 
+                        //update king location
+                        if (isWhite) {
+                            ChessGame.whiteKingLocation = this.location;
+                        } else {
+                            ChessGame.blackKingLocation = this.location;
+                        }
+
                         //revalidate and repaint
                         rOrigin.revalidate();
                         rTarget.revalidate();
@@ -124,15 +155,15 @@ public class King extends Piece{
 
                     return true;
                 } else {
-                    System.out.println("Invalid castle piece blocking");
+                    //System.out.println("Invalid castle piece blocking");
                     return false;
                 }
             } else {
-                System.out.println("Invalid castle rook has moved");
+                //System.out.println("Invalid castle rook has moved");
                 return false;
             }
         } else {
-            System.out.println("Invalid castle corner piece is not a rook");
+            //System.out.println("Invalid castle corner piece is not a rook");
             return false;
         }
     }

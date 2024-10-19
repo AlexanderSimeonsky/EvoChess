@@ -1,9 +1,11 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
 import javax.swing.*;
 
+/**
+ * Pawn class to handle the behaviour of pawns.
+ */
 public class Pawn extends Piece {
     int points = 1;
     int turnDoubleMoveHappened = 0;
@@ -25,7 +27,7 @@ public class Pawn extends Piece {
         }
 
         if (enPassant(target)) {
-            System.out.println("Enpassant successful");
+            //System.out.println("Enpassant successful");
             return true;
         }
         
@@ -85,36 +87,41 @@ public class Pawn extends Piece {
         return false;
     }
 
+    /**
+     * Method to handle special en passant move case.
+     * @param target square where the piece wants to move
+     * @return return boolean value wheter the move is valid
+     */
     public boolean enPassant(Point target) {
         if (isWhite) {
             //if white en passant can only happen at row index 3
             if (location.x != 3) {
-                System.out.println("white can only enpassant on row index 3");
+                //System.out.println("white can only enpassant on row index 3");
                 return false;
             }
 
             //check for piece one row below target
-            System.out.println("//check for piece one row below target");
+            //System.out.println("//check for piece one row below target");
             if (ChessGame.board[target.x - 1][target.y] != null) {
                 if (ChessGame.board[target.x - 1][target.y] instanceof Pawn) {
                     //if piece is pawn check if it moved two squares at once and last turn
-                    System.out.println("//if piece is pawn check if it moved two squares at once and last turn");
+                    //System.out.println("//if pawn check if it moved two squares last turn");
                     Pawn p = (Pawn) ChessGame.board[target.x - 1][target.y];
                     if (p.turnDoubleMoveHappened + 1 == ChessGame.turnCounter) {
                         //if all conditions are valid capture the pawn
-                        System.out.println("//if all conditions are valid capture the pawn");
+                        //System.out.println("//if all conditions are valid capture the pawn");
                         JPanel temp = ChessGame.chessBoardPanel;
                         JPanel sq = (JPanel) temp.getComponent(8 * (target.x + 1) + target.y);
                         JPanel prevSq = (JPanel) temp.getComponent(target.x * 8 + target.y);
 
                         //remove the captured piece
-                        System.out.println("//remove the captured piece");
+                        //System.out.println("//remove the captured piece");
                         sq.removeAll();
                         sq.putClientProperty("piece", null);
                         ChessGame.board[target.x - 1][target.y] = null;
 
                         // Revalidate and repaint the chessboard
-                        System.out.println("// Revalidate and repaint the chessboard");
+                        //System.out.println("// Revalidate and repaint the chessboard");
                         prevSq.revalidate();
                         sq.revalidate();
                         ChessGame.chessBoardPanel.revalidate();
@@ -128,34 +135,34 @@ public class Pawn extends Piece {
 
         } else {
             //if black en passant can only happen at row index 4
-            System.out.println("");
+            //System.out.println("");
             if (location.x != 4) {
-                System.out.println("black can only enpassant on row index 4");
+                //System.out.println("black can only enpassant on row index 4");
                 return false;
             }
 
             //check for piece one row above target
-            System.out.println("//check for piece one row above target");
+            //System.out.println("//check for piece one row above target");
             if (ChessGame.board[target.x + 1][target.y] != null) {
                 if (ChessGame.board[target.x + 1][target.y] instanceof Pawn) {
                     //if piece is pawn check if it moved two squares at once and last turn
-                    System.out.println("//if piece is pawn check if it moved two squares at once and last turn");
+                    //System.out.println("//if pawn check if it moved two squares last turn");
                     Pawn p = (Pawn) ChessGame.board[target.x + 1][target.y];
                     if (p.turnDoubleMoveHappened + 1 == ChessGame.turnCounter) {
                         //if all conditions are valid capture the pawn
-                        System.out.println("//if all conditions are valid capture the pawn");
+                        //System.out.println("//if all conditions are valid capture the pawn");
                         JPanel temp = ChessGame.chessBoardPanel;
                         JPanel sq = (JPanel) temp.getComponent(8 * (target.x - 1) + target.y);
                         JPanel prevSq = (JPanel) temp.getComponent(target.x * 8 + target.y);
 
                         //remove the captured piece
-                        System.out.println("//remove the captured piece");
+                        //System.out.println("//remove the captured piece");
                         sq.removeAll();
                         sq.putClientProperty("piece", null);
                         ChessGame.board[target.x + 1][target.y] = null;
 
                         // Revalidate and repaint the chessboard
-                        System.out.println("// Revalidate and repaint the chessboard");
+                        //System.out.println("// Revalidate and repaint the chessboard");
                         prevSq.revalidate();
                         sq.revalidate();
                         ChessGame.chessBoardPanel.revalidate();
@@ -164,20 +171,23 @@ public class Pawn extends Piece {
 
                         return true;
                     } else {
-                        System.out.println("turndoublemoved is different");
+                        //System.out.println("turndoublemoved is different");
                     }
                 } else {
-                    System.out.println("not a pawn");
+                    //System.out.println("not a pawn");
                 }
             } else {
-                System.out.println("square is null " + ChessGame.board[target.x + 1][target.y]);
+                //System.out.println("square is null " + ChessGame.board[target.x + 1][target.y]);
             }
         }
 
-        System.out.println("invalid enpassant");
+        //System.out.println("invalid enpassant");
         return false;
     }
 
+    /**
+     * Method to handle pawn promotion.
+     */
     public void promotion() {
         // Create the promotion panel
         String colour = "";
@@ -187,7 +197,6 @@ public class Pawn extends Piece {
         promotionPanel.setBackground(new Color(149, 69, 53));
     
         // Define promotion options
-        String[] promotionOptions = {"Bishop", "Knight", "Rook", "Queen"};
         String[] pieceNames;
     
         // Determine piece names based on the color of the pawn
@@ -201,10 +210,10 @@ public class Pawn extends Piece {
     
         // Create buttons for each promotion option
         for (int i = 0; i < 4; i++) {
-            int index = i;  // Declare a final variable to capture the current value of i
+            int index = i;
             JButton button = new JButton();
-            button.setBackground(new Color(200, 200, 200)); // Light grey background
-            button.setForeground(Color.BLACK); // Black text
+            button.setBackground(new Color(200, 200, 200));
+            button.setForeground(Color.BLACK);
             ImageIcon icon = new ImageIcon("sprites/" + colour + "/" + pieceNames[i] + ".png");
             Image img = icon.getImage();
             icon = new ImageIcon(img.getScaledInstance(105, 105, Image.SCALE_SMOOTH));
@@ -214,7 +223,7 @@ public class Pawn extends Piece {
             button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    promotePawn(pieceNames[index]); // Use the final variable here
+                    promotePawn(pieceNames[index]);
                     // Close the promotion panel after selection
                     promotionPanel.setVisible(false);
                     ChessGame.frame.remove(promotionPanel);
@@ -231,7 +240,10 @@ public class Pawn extends Piece {
     }
     
     
-
+    /**
+     * Helper method to promote pawns.
+     * @param pieceName the piece that the pawn is promoting to.
+     */
     public void promotePawn(String pieceName) {
         String colour = "";
         if (isWhite) {

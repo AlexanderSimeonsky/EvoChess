@@ -1,6 +1,8 @@
 import java.awt.*;
 
-/**. */
+/**
+ * Piece super class from which all piece types derive. 
+ */
 public class Piece {  
 
     boolean isWhite;
@@ -21,15 +23,21 @@ public class Piece {
         return true;
     }
 
-    boolean PieceIsOnStraightLine(Point target) {
+    /**
+     * Method to determine of a piece is blocking a move on
+     * a straight line.
+     * @param target the square that the piece wants to move to
+     * @return returns if the move is valid
+     */
+    boolean pieceIsOnStraightLine(Point target) {
         //when piece is moving left
         for (int col = location.y - 1; col > target.y; col--) {
             for (Piece[] pieces : ChessGame.board) {
                 for (Piece piece : pieces) {
                     if (piece != null) {
                         if (piece.location.y == col && piece.location.x == target.x) {
-                            System.out.println("Invalid move piece in the way");
-                            System.out.println(piece.location + " " + piece);
+                            //System.out.println("Invalid move piece in the way");
+                            //System.out.println(piece.location + " " + piece);
                             return true;
                         }
                     }
@@ -43,8 +51,8 @@ public class Piece {
                 for (Piece piece : pieces) {
                     if (piece != null) {
                         if (piece.location.y == col && piece.location.x == target.x) {
-                            System.out.println("Invalid move piece in the way");
-                            System.out.println(piece.location + " " + piece);
+                            //System.out.println("Invalid move piece in the way");
+                            //System.out.println(piece.location + " " + piece);
                             return true;
                         }
                     }
@@ -58,8 +66,8 @@ public class Piece {
                 for (Piece piece : pieces) {
                     if (piece != null) {
                         if (piece.location.y == target.y && piece.location.x == row) {
-                            System.out.println("Invalid move piece in the way");
-                            System.out.println(piece.location + " " + piece);
+                            //System.out.println("Invalid move piece in the way");
+                            //System.out.println(piece.location + " " + piece);
                             return true;
                         }
                     }
@@ -73,8 +81,8 @@ public class Piece {
                 for (Piece piece : pieces) {
                     if (piece != null) {
                         if (piece.location.y == target.y && piece.location.x == row) {
-                            System.out.println("Invalid move piece in the way");
-                            System.out.println(piece.location + " " + piece);
+                            //System.out.println("Invalid move piece in the way");
+                            //System.out.println(piece.location + " " + piece);
                             return true;
                         }
                     }
@@ -82,11 +90,17 @@ public class Piece {
             }
         }
 
-        System.out.println("No piece in the way valid move");
+        //System.out.println("No piece in the way valid move");
         return false;
     }
 
-    boolean PieceIsOnDiagonalLine(Point target) {
+    /**
+     * Method to determine of a piece is blocking a move on
+     * a diagonal line.
+     * @param target the square that the piece wants to move to
+     * @return returns if the move is valid
+     */
+    boolean pieceIsOnDiagonalLine(Point target) {
         if (target.x < location.x) {
             //up left
             for (int col = location.y - 1; col > target.y; col--) {
@@ -95,7 +109,7 @@ public class Piece {
                     for (Piece piece : pieces) {
                         if (piece != null) {
                             if (piece.location.y == col && piece.location.x == location.x - diff) {
-                                System.out.println("Invalid move piece in the way");
+                                //System.out.println("Invalid move piece in the way");
                                 System.out.println(piece.location + " " + piece);
                                 return true;
                             }
@@ -111,8 +125,8 @@ public class Piece {
                     for (Piece piece : pieces) {
                         if (piece != null) {
                             if (piece.location.y == col && piece.location.x == location.x - diff) {
-                                System.out.println("Invalid move piece in the way");
-                                System.out.println(piece.location + " " + piece);
+                                //System.out.println("Invalid move piece in the way");
+                                //System.out.println(piece.location + " " + piece);
                                 return true;
                             }
                         }
@@ -129,8 +143,8 @@ public class Piece {
                     for (Piece piece : pieces) {
                         if (piece != null) {
                             if (piece.location.y == col && piece.location.x == location.x + diff) {
-                                System.out.println("Invalid move piece in the way");
-                                System.out.println(piece.location + " " + piece);
+                                //System.out.println("Invalid move piece in the way");
+                                //System.out.println(piece.location + " " + piece);
                                 return true;
                             }
                         }
@@ -145,8 +159,8 @@ public class Piece {
                     for (Piece piece : pieces) {
                         if (piece != null) {
                             if (piece.location.y == col && piece.location.x == location.x + diff) {
-                                System.out.println("Invalid move piece in the way");
-                                System.out.println(piece.location + " " + piece);
+                                //System.out.println("Invalid move piece in the way");
+                                //System.out.println(piece.location + " " + piece);
                                 return true;
                             }
                         }
@@ -155,9 +169,10 @@ public class Piece {
             }
         }
 
-        System.out.println("No piece in the way valid move");
+        //System.out.println("No piece in the way valid move");
         return false;
     }
+    
 
     void move(Point target) {
         location = target;
