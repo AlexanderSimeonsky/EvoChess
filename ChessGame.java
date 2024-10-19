@@ -326,8 +326,7 @@ public class ChessGame {
         * @param target needed to simulate the move
         * @return returns if the move is illegal
         */
-        public boolean illegalMove(Point target, Piece selectedPiece) { //issue of this method is that the board is not 
-                                                //updating properly it seems that the board from the previous turn is used
+        public boolean illegalMove(Point target, Piece selectedPiece) {
                                                 
             // Store the current locations of the pieces
             Piece targetP = board[target.x][target.y];
@@ -337,7 +336,7 @@ public class ChessGame {
             board[target.x][target.y] = selectedPiece;
             board[selectedPiece.location.x][selectedPiece.location.y] = null;
             selectedPiece.location = target;
-    
+
             // Fetch the location of the king
             Point kingPoint;
             King king;
@@ -349,6 +348,12 @@ public class ChessGame {
                 kingPoint = blackKingLocation;
                 king = (King) board[kingPoint.x][kingPoint.y];
                 System.out.println("Checking for black king at: " + kingPoint);
+            }
+
+            //check if moving piece is a king
+            if (selectedPiece instanceof King) {
+                //check colour
+                king = (King) selectedPiece;
             }
     
             // Check if any piece can attack the king
