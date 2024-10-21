@@ -214,6 +214,15 @@ public class ChessGame {
                                     clickedSquare.putClientProperty("piece", selectedPiece);
                                     board[p.location.x][p.location.y] = selectedPiece;
                                     selectedPiece.move(new Point(p.location.x, p.location.y));
+
+                                    //if king moved update variable for king location
+                                    if (selectedPiece instanceof King) {
+                                        if (selectedPiece.isWhite) {
+                                            whiteKingLocation = new Point(p.location.x, p.location.y);
+                                        } else {
+                                            blackKingLocation = new Point(p.location.x, p.location.y);
+                                        }
+                                    }
     
                                     //remove it from previous location
                                     System.out.println(" //remove it from previous location");
@@ -276,6 +285,15 @@ public class ChessGame {
                                 clickedSquare.putClientProperty("piece", selectedPiece);
                                 board[targetRow][targetCol] = selectedPiece;
                                 selectedPiece.move(new Point(targetRow, targetCol));
+
+                                //if king moved update variable for king location
+                                if (selectedPiece instanceof King) {
+                                    if (selectedPiece.isWhite) {
+                                        whiteKingLocation = new Point(targetRow, targetCol);
+                                    } else {
+                                        blackKingLocation = new Point(targetRow, targetCol);
+                                    }
+                                }
                                 
                                 //remove it from previous location
                                 System.out.println("//remove it from previous location");
@@ -368,7 +386,15 @@ public class ChessGame {
             selectedPiece.location = target;
 
             // Fetch the location of the king
-            King king = getKing();
+            Point kingPoint;
+            King king;
+            if (isWhiteTurn) {
+                kingPoint = whiteKingLocation;
+                king = (King) board[kingPoint.x][kingPoint.y];
+            } else {
+                kingPoint = blackKingLocation;
+                king = (King) board[kingPoint.x][kingPoint.y];
+            }
 
             //check if moving piece is a king
             if (selectedPiece instanceof King) {
@@ -423,28 +449,7 @@ public class ChessGame {
         }
 
         private boolean draw() {
-            ArrayList<Piece> pieces = new ArrayList<>();
-
-            for (Piece[] pieceArr : board) {
-                for (Piece p : pieceArr) {
-                    if (p != null) {
-                        pieces.add(p);
-                    }
-                }
-            }
-
-            //get king
-            King king = getKing();
-
-            //check for stalemate (no legal moves left)
-            if (stalemate(king)) {
-                return true;
-            }
             
-            //check for dead position (insufficient pieces to win the game)
-            if (deadPosition(pieces)) {
-                return true;
-            }
             
             //no draw condition is met
             return false;
@@ -500,6 +505,7 @@ public class ChessGame {
             //check if king can move
             if (kingCanEscape(king)) {
                 //king can move
+                System.out.println("King can escape");
                 return false;
             }
 
@@ -513,7 +519,7 @@ public class ChessGame {
             } else {
                 //check if any piece can move
                 for (Piece p : alliedPieces) {
-                    if (p.hasLegalMoves() && !(p instanceof King)) {
+                    if (p.hasLegalMoves()) {
                         //piece can move
                         return false;
                     }
@@ -521,6 +527,7 @@ public class ChessGame {
             }
 
             //no piece can move so stalemate
+            System.out.println("No piece can move");
             return true;
         }
 
@@ -629,7 +636,7 @@ public class ChessGame {
             return point.x >= 0 && point.x <= 7 && point.y >= 0 && point.y <= 7; 
         }
 
-        public static King getKing() {
+        public King getKing() {
             Point kingPoint;
             if (isWhiteTurn) {
                 kingPoint = whiteKingLocation;
