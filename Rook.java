@@ -37,4 +37,49 @@ public class Rook extends Piece {
         
         return validMove(target);
     }
+
+    @Override
+    boolean hasLegalMoves() {
+        Point[] directions = {
+            new Point(1, 0), //down
+            new Point(-1, 0), //up
+            new Point(0, 1), //right
+            new Point(0, -1) //left
+        };
+
+        for (Point d : directions) {
+            Point currPos = location;
+
+            while (true) {
+                Point newPos = new Point(currPos.x + d.x, currPos.y + d.y);
+                if (!ChessGame.ChessMouseListener.pointInBoard(newPos)) {
+                    //position not in board
+                    break;
+                }
+
+                //check if position is occupied
+                Piece occupyingPiece = ChessGame.board[newPos.x][newPos.y];
+                if (occupyingPiece != null) {
+                    //check colour of piece
+                    if (occupyingPiece.isWhite != isWhite) {
+                        if (validCapture(d) && !ChessGame.ChessMouseListener.illegalMove(d, this)) {
+                            //can capture so can move
+                            return true;
+                        }
+                    }
+                    break;
+                } else {
+                    if (validMove(d) && !ChessGame.ChessMouseListener.illegalMove(d, this)) {
+                        //can move
+                        return true;
+                    }
+                }
+
+                currPos = newPos;
+            }
+        }
+
+        //no moves
+        return false;
+    }
 }

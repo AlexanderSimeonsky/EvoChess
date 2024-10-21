@@ -172,6 +172,10 @@ public class Piece {
         //System.out.println("No piece in the way valid move");
         return false;
     }
+
+    boolean hasLegalMoves() {
+        return true;
+    }
     
 
     void move(Point target) {

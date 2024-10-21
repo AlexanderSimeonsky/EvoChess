@@ -238,7 +238,41 @@ public class Pawn extends Piece {
         ChessGame.frame.add(promotionPanel);
         ChessGame.frame.setVisible(true); // Ensure the frame is visible
     }
-    
+
+    @Override
+    boolean hasLegalMoves() {
+        Point moveD = new Point(isWhite ? -1 : 1, 0);
+        Point[] captureD = {
+            new Point(isWhite ? -1 : 1, -1), //diagonal left
+            new Point(isWhite ? -1 : 1, 1), //diagonal right
+        };
+
+        //move check
+        //check for piece
+        Point forwardMove = new Point(location.x + moveD.x, location.y);
+        if (ChessGame.board[forwardMove.x][forwardMove.y] == null) {
+            if (validMove(forwardMove) && !ChessGame.ChessMouseListener.illegalMove(forwardMove, this)) {
+                //can move
+                return true;
+            }
+        }
+
+        //capture check
+        for (Point d : captureD) {
+            Point newPos = new Point(location.x + d.x, location.y + d.y);
+            Piece occupyingPiece = ChessGame.board[newPos.x][newPos.y];
+            if (occupyingPiece != null && occupyingPiece.isWhite != isWhite) {
+                if (validCapture(newPos) && !ChessGame.ChessMouseListener.illegalMove(newPos, this)) {
+                    //can capture so can move
+                    return true;
+                }
+            }
+            
+        }
+
+        //no moves
+        return false;
+    }
     
     /**
      * Helper method to promote pawns.
