@@ -388,7 +388,7 @@ public class ChessGame {
             // Fetch the location of the king
             Point kingPoint;
             King king;
-            if (isWhiteTurn) {
+            if (selectedPiece.isWhite) {
                 kingPoint = whiteKingLocation;
                 king = (King) board[kingPoint.x][kingPoint.y];
             } else {
@@ -416,7 +416,15 @@ public class ChessGame {
 
         public boolean checkMate() {
             //get the location of the king
-            King king = getKing();
+            Point kingPoint;
+            King king;
+            if (isWhiteTurn) {
+                kingPoint = whiteKingLocation;
+                king = (King) board[kingPoint.x][kingPoint.y];
+            } else {
+                kingPoint = blackKingLocation;
+                king = (King) board[kingPoint.x][kingPoint.y];
+            }
 
             //check if there is an active check
             if (king.isInCheck()) {
@@ -449,9 +457,95 @@ public class ChessGame {
         }
 
         private boolean draw() {
-            
+            ArrayList<Piece> pieces = new ArrayList<Piece>();
+    
+            for (Piece[] piece : board) {
+                for (Piece p : pieces) {
+                    if (p != null) {
+                        pieces.add(p);
+                    }
+                }
+            }
+    
+            King king = getKing();
+    
+            if (stalemate(king)) {
+                return true;
+            }
+    
+            if (deadPosition(pieces)) {
+                return true;
+            }
             
             //no draw condition is met
+            return false;
+        }
+    
+        private boolean stalemate(King king) {
+            //check if king can move
+            if (kingCanEscape(king)) {
+                //king can move
+                System.out.println("King can escape");
+                return false;
+            }
+    
+            //check if any other allied piece can move
+            ArrayList<Piece> alliedPieces = getAlliedPieces(isWhiteTurn);
+    
+            //check count
+            if (alliedPieces.size() == 1) {
+                //only king 
+                return true;
+            } else {
+                //check if any piece can move
+                for (Piece p : alliedPieces) {
+                    if (p.hasLegalMoves()) {
+                        //piece can move
+                        return false;
+                    }
+                }
+            }
+    
+            //no piece can move so stalemate
+            System.out.println("No piece can move");
+            return true;
+        }
+    
+        private boolean deadPosition(ArrayList<Piece> pieces) {
+            //get number of pieces remaining
+            int count = pieces.size();
+    
+            //no need to check for dead position if there are 5 or more pieces
+            if (count >= 5) {
+                return false;
+            }
+    
+            //check the type of pieces remaining
+            for (Piece p : pieces) {
+                if (p instanceof Rook || p instanceof Queen || p instanceof Pawn) {
+                    //can always win if you have a rook or queen or pawn
+                    return false;
+                } else if (p instanceof King) {
+                    if (count == 2) {
+                        //only kings left
+                        return true;
+                    }
+                } else {
+                    //knight or bishop
+                    //check if the remaining 2 non king pieces are of the same colour
+                    for (Piece p2 : pieces) {
+                        if (!(p2 instanceof King) && p2 != p && p2.isWhite == p.isWhite) {
+                            //pieces are same colour can win
+                            return false;
+                        } else {
+                            //pieces are different colour so draw
+                            return true;
+                        }
+                    }
+                }
+            }
+    
+            //return false as a default
             return false;
         }
 
@@ -498,74 +592,6 @@ public class ChessGame {
             }
 
             //king can't escape
-            return false;
-        }
-
-        private boolean stalemate(King king) {
-            //check if king can move
-            if (kingCanEscape(king)) {
-                //king can move
-                System.out.println("King can escape");
-                return false;
-            }
-
-            //check if any other allied piece can move
-            ArrayList<Piece> alliedPieces = getAlliedPieces(isWhiteTurn);
-
-            //check count
-            if (alliedPieces.size() == 1) {
-                //only king 
-                return true;
-            } else {
-                //check if any piece can move
-                for (Piece p : alliedPieces) {
-                    if (p.hasLegalMoves()) {
-                        //piece can move
-                        return false;
-                    }
-                }
-            }
-
-            //no piece can move so stalemate
-            System.out.println("No piece can move");
-            return true;
-        }
-
-        private boolean deadPosition(ArrayList<Piece> pieces) {
-            //get number of pieces remaining
-            int count = pieces.size();
-
-            //no need to check for dead position if there are 5 or more pieces
-            if (count >= 5) {
-                return false;
-            }
-
-            //check the type of pieces remaining
-            for (Piece p : pieces) {
-                if (p instanceof Rook || p instanceof Queen || p instanceof Pawn) {
-                    //can always win if you have a rook or queen or pawn
-                    return false;
-                } else if (p instanceof King) {
-                    if (count == 2) {
-                        //only kings left
-                        return true;
-                    }
-                } else {
-                    //knight or bishop
-                    //check if the remaining 2 non king pieces are of the same colour
-                    for (Piece p2 : pieces) {
-                        if (!(p2 instanceof King) && p2 != p && p2.isWhite == p.isWhite) {
-                            //pieces are same colour can win
-                            return false;
-                        } else {
-                            //pieces are different colour so draw
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            //return false as a default
             return false;
         }
 
@@ -636,17 +662,6 @@ public class ChessGame {
             return point.x >= 0 && point.x <= 7 && point.y >= 0 && point.y <= 7; 
         }
 
-        public King getKing() {
-            Point kingPoint;
-            if (isWhiteTurn) {
-                kingPoint = whiteKingLocation;
-                return (King) board[kingPoint.x][kingPoint.y];
-            } else {
-                kingPoint = blackKingLocation;
-                return (King) board[kingPoint.x][kingPoint.y];
-            }
-        }
-
         public ArrayList<Piece> getAlliedPieces(boolean isWhite) {
             ArrayList<Piece> alliedPieces = new ArrayList<Piece>();
 
@@ -661,6 +676,17 @@ public class ChessGame {
             }
 
             return alliedPieces;
+        }
+
+        public King getKing() {
+            Point kingPoint;
+            if (isWhiteTurn) {
+                kingPoint = whiteKingLocation;
+                return (King) board[kingPoint.x][kingPoint.y];
+            } else {
+                kingPoint = blackKingLocation;
+                return (King) board[kingPoint.x][kingPoint.y];
+            }
         }
 
         public boolean canBlockStraightLine(ArrayList<Piece> alliedPieces, Piece checkingPiece, King king, int deltaX, int deltaY) {
