@@ -17,21 +17,21 @@ public class Rook extends Piece {
         }
 
         if (target.x == location.x || target.y == location.y) {
-            System.out.println("Check if there is blocking piece");
-            if (!PieceIsOnStraightLine(target)) {
+            //System.out.println("Check if there is blocking piece");
+            if (!pieceIsOnStraightLine(target)) {
                 hasMoved = true;
                 return true;
             }
         }
 
-        System.out.println("Invalid move");
+        //System.out.println("Invalid move");
         return false;
     }
 
     @Override
     boolean validCapture(Point target) {
         if (location.equals(target)) {
-            System.out.println("invalid move");
+            //System.out.println("invalid move");
             return false; // No move if the target is the same as the current location
         }
         

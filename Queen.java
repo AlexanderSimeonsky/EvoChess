@@ -16,19 +16,19 @@ public class Queen extends Piece {
 
         //Vertical and Horizontal movement
         if (target.x == location.x || target.y == location.y) {
-            System.out.println("Check if there is blocking piece");
-            if (!PieceIsOnStraightLine(target)) {
+            //System.out.println("Check if there is blocking piece");
+            if (!pieceIsOnStraightLine(target)) {
                 return true;
             }
         }
 
         //Diagonal movement
         if (Math.abs(target.y - location.y) == Math.abs(target.x - location.x)) {
-            if (!PieceIsOnDiagonalLine(target)) {
+            if (!pieceIsOnDiagonalLine(target)) {
                 return true;
             }
         }
-        System.out.println("Invalid move");
+        //System.out.println("Invalid move");
         return false;
     }
 
@@ -38,7 +38,7 @@ public class Queen extends Piece {
             return false; // No move if the target is the same as the current location
         }
         
-        System.out.println("check valid move move");
+        //System.out.println("check valid move move");
         return validMove(target);
     }
 }
