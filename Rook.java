@@ -62,14 +62,14 @@ public class Rook extends Piece {
                 if (occupyingPiece != null) {
                     //check colour of piece
                     if (occupyingPiece.isWhite != isWhite) {
-                        if (validCapture(d) && !ChessGame.ChessMouseListener.illegalMove(d, this)) {
+                        if (validCapture(d) && !illegalMove(d)) {
                             //can capture so can move
                             return true;
                         }
                     }
                     break;
                 } else {
-                    if (validMove(d) && !ChessGame.ChessMouseListener.illegalMove(d, this)) {
+                    if (validMove(d) && !illegalMove(d)) {
                         //can move
                         return true;
                     }

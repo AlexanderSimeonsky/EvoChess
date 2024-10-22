@@ -198,7 +198,7 @@ public class ChessGame {
                                 System.out.println("//if it is not the same colour check for valid capture");
     
                                 Point point = new Point(p.location.x, p.location.y);
-                                if (selectedPiece.validCapture(point) && !illegalMove(point, selectedPiece)) {
+                                if (selectedPiece.validCapture(point) && !selectedPiece.illegalMove(point)) {
     
                                     //if capture is valid then capture
                                     System.out.println("//if capture is valid then capture");
@@ -275,7 +275,7 @@ public class ChessGame {
                             int targetCol = targetIndex % 8; 
     
                             Point point = new Point(targetRow, targetCol);
-                            if (selectedPiece.validMove(point) && !illegalMove(point, selectedPiece)) {
+                            if (selectedPiece.validMove(point) && !selectedPiece.illegalMove(point)) {
                                 //if it is a valid move then move the piece
                                 System.out.println("//if it is a valid move then move the piece");
     
@@ -369,51 +369,6 @@ public class ChessGame {
             }
         }
 
-        /**
-        * Method to check if the move is illegal.
-        * @param target needed to simulate the move
-        * @return returns if the move is illegal
-        */
-        public static boolean illegalMove(Point target, Piece selectedPiece) {
-                                                
-            // Store the current locations of the pieces
-            Piece targetP = board[target.x][target.y];
-            Point spLocation = selectedPiece.location;
-    
-            // Move the piece temporarily
-            board[target.x][target.y] = selectedPiece;
-            board[selectedPiece.location.x][selectedPiece.location.y] = null;
-            selectedPiece.location = target;
-
-            // Fetch the location of the king
-            Point kingPoint;
-            King king;
-            if (selectedPiece.isWhite) {
-                kingPoint = whiteKingLocation;
-                king = (King) board[kingPoint.x][kingPoint.y];
-            } else {
-                kingPoint = blackKingLocation;
-                king = (King) board[kingPoint.x][kingPoint.y];
-            }
-
-            //check if moving piece is a king
-            if (selectedPiece instanceof King) {
-                //check colour
-                king = (King) selectedPiece;
-            }
-    
-            // Check if any piece can attack the king
-            boolean check = king.isInCheck();
-    
-            // Revert the move
-            board[target.x][target.y] = targetP;
-            board[spLocation.x][spLocation.y] = selectedPiece;
-            selectedPiece.location = spLocation;
-    
-            // Return true if the king is in check
-            return check;
-        }
-
         public boolean checkMate() {
             //get the location of the king
             Point kingPoint;
@@ -469,9 +424,9 @@ public class ChessGame {
     
             King king = getKing();
     
-            if (stalemate(king)) {
-                return true;
-            }
+            //if (stalemate(king)) {
+                //return true;
+            //}
     
             if (deadPosition(pieces)) {
                 return true;
@@ -574,7 +529,7 @@ public class ChessGame {
                         Piece piece = board[point.x][point.y];
                         //if there is piece check for valid capture
                         if (king.isWhite != piece.isWhite) {
-                            if (king.validCapture(point) && !illegalMove(point, king)) {
+                            if (king.validCapture(point) && !king.illegalMove(point)) {
                                 System.out.println(point);
                                 //king can move
                                 return true;
@@ -582,7 +537,7 @@ public class ChessGame {
                         }
                     } else {
                         //if empty check for valid move
-                        if (king.validMove(point) && !illegalMove(point, king)) {
+                        if (king.validMove(point) && !king.illegalMove(point)) {
                             System.out.println(point);
                             //king can move
                             return true;
@@ -604,7 +559,7 @@ public class ChessGame {
 
             //check if checking piece can be captured
             for (Piece piece : alliedPieces) {
-                if (piece.validCapture(checkingPiece.location) && !illegalMove(checkingPiece.location, piece)) {
+                if (piece.validCapture(checkingPiece.location) && !piece.illegalMove(checkingPiece.location)) {
                     //piece can be captured
                     return true;
                 }
@@ -697,7 +652,7 @@ public class ChessGame {
                     for (int i = king.location.y - 1; i < checkingPiece.location.y; i--) {
                         for (Piece piece : alliedPieces) {
                             Point p = new Point(king.location.x, i);
-                            if (piece.validMove(p) && !illegalMove(p, piece)) {
+                            if (piece.validMove(p) && !piece.illegalMove(p)) {
                                 //can be blocked
                                 return true;
                             }
@@ -708,7 +663,7 @@ public class ChessGame {
                     for (int i = king.location.y + 1; i > checkingPiece.location.y; i++) {
                         for (Piece piece : alliedPieces) {
                             Point p = new Point(king.location.x, i);
-                            if (piece.validMove(p) && !illegalMove(p, piece)) {
+                            if (piece.validMove(p) && !piece.illegalMove(p)) {
                                 //can be blocked
                                 return true;
                             }
@@ -722,7 +677,7 @@ public class ChessGame {
                     for (int i = king.location.x - 1; i < checkingPiece.location.x; i--) {
                         for (Piece piece : alliedPieces) {
                             Point p = new Point(i, king.location.y);
-                            if (piece.validMove(p) && !illegalMove(p, piece)) {
+                            if (piece.validMove(p) && !piece.illegalMove(p)) {
                                 //can be blocked
                                 return true;
                             }
@@ -733,7 +688,7 @@ public class ChessGame {
                     for (int i = king.location.x + 1; i > checkingPiece.location.x; i++) {
                         for (Piece piece : alliedPieces) {
                             Point p = new Point(i, king.location.y);
-                            if (piece.validMove(p) && !illegalMove(p, piece)) {
+                            if (piece.validMove(p) && !piece.illegalMove(p)) {
                                 //can be blocked
                                 return true;
                             }
@@ -756,7 +711,7 @@ public class ChessGame {
                         int diff = Math.abs(i - king.location.y);
                         for (Piece piece : alliedPieces) {
                             Point p = new Point(king.location.x - diff, i);
-                            if (piece.validMove(p) && !illegalMove(p, piece)) {
+                            if (piece.validMove(p) && !piece.illegalMove(p)) {
                                 //can be blocked
                                 return true;
                             }
@@ -769,7 +724,7 @@ public class ChessGame {
                         int diff = Math.abs(i - king.location.y);
                         for (Piece piece : alliedPieces) {
                             Point p = new Point(king.location.x - diff, i);
-                            if (piece.validMove(p) && !illegalMove(p, piece)) {
+                            if (piece.validMove(p) && !piece.illegalMove(p)) {
                                 //can be blocked
                                 return true;
                             }
@@ -786,7 +741,7 @@ public class ChessGame {
                         int diff = Math.abs(i - king.location.y);
                         for (Piece piece : alliedPieces) {
                             Point p = new Point(king.location.x + diff, i);
-                            if (piece.validMove(p) && !illegalMove(p, piece)) {
+                            if (piece.validMove(p) && !piece.illegalMove(p)) {
                                 //can be blocked
                                 return true;
                             }
@@ -799,7 +754,7 @@ public class ChessGame {
                         int diff = Math.abs(i - king.location.y);
                         for (Piece piece : alliedPieces) {
                             Point p = new Point(king.location.x + diff, i);
-                            if (piece.validMove(p) && !illegalMove(p, piece)) {
+                            if (piece.validMove(p) && !piece.illegalMove(p)) {
                                 //can be blocked
                                 return true;
                             }
