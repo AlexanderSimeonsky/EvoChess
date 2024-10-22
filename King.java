@@ -173,7 +173,7 @@ public class King extends Piece{
         for (Piece[] pieces : ChessGame.board) {
             for (Piece p : pieces) {
                 if (p != null && p.isWhite != isWhite) {
-                    if (p.validCapture(location) && !ChessGame.ChessMouseListener.illegalMove(location, p)) {
+                    if (p.validCapture(location)) {
                         check = true; // The king is in check
                         break;
                     }
@@ -185,19 +185,5 @@ public class King extends Piece{
         }
 
         return check;
-    }
-
-    public Piece getCheckingPiece() {
-        for (Piece[] pieces : ChessGame.board) {
-            for (Piece p : pieces) {
-                if (p != null && p.isWhite != isWhite) {
-                    if (p.validCapture(location) && !ChessGame.ChessMouseListener.illegalMove(location, p)) {
-                        return p;
-                    }
-                }
-            }
-        }
-
-        return null;
     }
 }

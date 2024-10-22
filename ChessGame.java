@@ -1,8 +1,6 @@
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-
 import javax.swing.*;
 
 /**
@@ -11,27 +9,21 @@ import javax.swing.*;
 public class ChessGame {
     public static JFrame frame;
     public static JPanel chessBoardPanel; //visual board
-    private Piece selectedPiece;
-    private JPanel previousSquare;  
+    private Piece selectedPiece = null;
+    private JPanel previousSquare = null;  
     private int pieceSize = 105;
     public static Piece[][] board; //logical board
-    public static int turnCounter;
-    public static boolean isWhiteTurn; 
+    public static int turnCounter = 0;
+    public static boolean isWhiteTurn = true; 
     private JLabel turnLabel;
     public static Point whiteKingLocation; //track position of kings
     public static Point blackKingLocation;
-    public boolean gameIsOver;
 
     /**
      * Constructor that begins the game flow.
      */
     public ChessGame() {
         board = new Piece[8][8];
-        turnCounter = 0;
-        isWhiteTurn = true;
-        previousSquare = null;
-        selectedPiece = null;
-        gameIsOver = false;
         renderChessboard();
         renderPieces();
     }
@@ -238,10 +230,10 @@ public class ChessGame {
                                         System.out.println("GAMEOVER");
                                         gameEnd("Checkmate");
                                         gameIsOver = true;
-                                    } else if (draw()) {
-                                        gameEnd("Draw");
-                                        gameIsOver = true;
+                                    } else {
+                                        System.out.println("Game continues");
                                     }
+                                    //TODO stalemate
         
                                     // Reset selection after the move
                                     System.out.println("// Reset selection after the move");
@@ -300,10 +292,10 @@ public class ChessGame {
                                     System.out.println("GAMEOVER");
                                     gameEnd("Checkmate");
                                     gameIsOver = true;
-                                } else if (draw()) {
-                                    gameEnd("Draw");
-                                    gameIsOver = true;
+                                } else {
+                                    System.out.println("Game continues");
                                 }
+                                //TODO stalemate
     
                                 // Reset selection after the move
                                 System.out.println("// Reset selection after the move");
@@ -356,7 +348,7 @@ public class ChessGame {
         * @param target needed to simulate the move
         * @return returns if the move is illegal
         */
-        public static boolean illegalMove(Point target, Piece selectedPiece) {
+        public boolean illegalMove(Point target, Piece selectedPiece) {
                                                 
             // Store the current locations of the pieces
             Piece targetP = board[target.x][target.y];
@@ -390,7 +382,15 @@ public class ChessGame {
 
         public boolean checkMate() {
             //get the location of the king
-            King king = getKing();
+            Point kingPoint;
+            King king;
+            if (isWhiteTurn) {
+                kingPoint = whiteKingLocation;
+                king = (King) board[kingPoint.x][kingPoint.y];
+            } else {
+                kingPoint = blackKingLocation;
+                king = (King) board[kingPoint.x][kingPoint.y];
+            }
 
             //check if there is an active check
             if (king.isInCheck()) {
@@ -420,34 +420,6 @@ public class ChessGame {
             }
 
             return true;
-        }
-
-        private boolean draw() {
-            ArrayList<Piece> pieces = new ArrayList<>();
-
-            for (Piece[] pieceArr : board) {
-                for (Piece p : pieceArr) {
-                    if (p != null) {
-                        pieces.add(p);
-                    }
-                }
-            }
-
-            //get king
-            King king = getKing();
-
-            //check for stalemate (no legal moves left)
-            if (stalemate(king)) {
-                return true;
-            }
-            
-            //check for dead position (insufficient pieces to win the game)
-            if (deadPosition(pieces)) {
-                return true;
-            }
-            
-            //no draw condition is met
-            return false;
         }
 
         public boolean kingCanEscape(King king) {
@@ -493,72 +465,6 @@ public class ChessGame {
             }
 
             //king can't escape
-            return false;
-        }
-
-        private boolean stalemate(King king) {
-            //check if king can move
-            if (kingCanEscape(king)) {
-                //king can move
-                return false;
-            }
-
-            //check if any other allied piece can move
-            ArrayList<Piece> alliedPieces = getAlliedPieces(isWhiteTurn);
-
-            //check count
-            if (alliedPieces.size() == 1) {
-                //only king 
-                return true;
-            } else {
-                //check if any piece can move
-                for (Piece p : alliedPieces) {
-                    if (p.hasLegalMoves() && !(p instanceof King)) {
-                        //piece can move
-                        return false;
-                    }
-                }
-            }
-
-            //no piece can move so stalemate
-            return true;
-        }
-
-        private boolean deadPosition(ArrayList<Piece> pieces) {
-            //get number of pieces remaining
-            int count = pieces.size();
-
-            //no need to check for dead position if there are 5 or more pieces
-            if (count >= 5) {
-                return false;
-            }
-
-            //check the type of pieces remaining
-            for (Piece p : pieces) {
-                if (p instanceof Rook || p instanceof Queen || p instanceof Pawn) {
-                    //can always win if you have a rook or queen or pawn
-                    return false;
-                } else if (p instanceof King) {
-                    if (count == 2) {
-                        //only kings left
-                        return true;
-                    }
-                } else {
-                    //knight or bishop
-                    //check if the remaining 2 non king pieces are of the same colour
-                    for (Piece p2 : pieces) {
-                        if (!(p2 instanceof King) && p2 != p && p2.isWhite == p.isWhite) {
-                            //pieces are same colour can win
-                            return false;
-                        } else {
-                            //pieces are different colour so draw
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            //return false as a default
             return false;
         }
 
@@ -625,19 +531,8 @@ public class ChessGame {
             return false;
         }
 
-        public static boolean pointInBoard (Point point) {
+        public boolean pointInBoard (Point point) {
             return point.x >= 0 && point.x <= 7 && point.y >= 0 && point.y <= 7; 
-        }
-
-        public static King getKing() {
-            Point kingPoint;
-            if (isWhiteTurn) {
-                kingPoint = whiteKingLocation;
-                return (King) board[kingPoint.x][kingPoint.y];
-            } else {
-                kingPoint = blackKingLocation;
-                return (King) board[kingPoint.x][kingPoint.y];
-            }
         }
 
         public ArrayList<Piece> getAlliedPieces(boolean isWhite) {
@@ -779,26 +674,6 @@ public class ChessGame {
             //can't be blocked
             return false;
         }
-
-        private void gameEnd(String message) {
-            JLabel endLabel;
-            
-            if (message == "Checkmate") {
-                endLabel = new JLabel(isWhiteTurn ? "Black WINS! Checkmate!" : "White WINS! Checkmate!");
-            } else {
-                endLabel = new JLabel("DRAW!");
-            }
-
-            endLabel.setForeground(isWhiteTurn ? Color.BLACK : Color.WHITE);
-            endLabel.setFont(new Font("Arial", Font.BOLD, 20));
-            endLabel.setBounds(50, 200, 250, 100);
-            endLabel.setBackground(Color.WHITE);
-            frame.add(endLabel);
-
-            frame.revalidate();
-            frame.repaint();
-        }
-
     }
     
     public static void main(String[] args) {
