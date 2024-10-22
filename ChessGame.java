@@ -411,13 +411,20 @@ public class ChessGame {
             selectedPiece.location = spLocation;
     
             // Return true if the king is in check
-            System.out.println("Check " + selectedPiece + " " + check);
             return check;
         }
 
         public boolean checkMate() {
             //get the location of the king
-            King king = getKing();
+            Point kingPoint;
+            King king;
+            if (isWhiteTurn) {
+                kingPoint = whiteKingLocation;
+                king = (King) board[kingPoint.x][kingPoint.y];
+            } else {
+                kingPoint = blackKingLocation;
+                king = (King) board[kingPoint.x][kingPoint.y];
+            }
 
             //check if there is an active check
             if (king.isInCheck()) {
@@ -453,28 +460,18 @@ public class ChessGame {
             ArrayList<Piece> pieces = new ArrayList<Piece>();
     
             for (Piece[] piece : board) {
-                for (Piece p : piece) {
+                for (Piece p : pieces) {
                     if (p != null) {
                         pieces.add(p);
                     }
                 }
             }
-
-            int count = pieces.size();
-
-            //no need to check for draw if there are 5 or more pieces
-            if (count >= 5) {
-                System.out.println("more than 5 pieces");
-                return false;
-            }
-            System.out.println("less thena 5 pieces" + pieces.size());
     
             King king = getKing();
-            
-            //if (stalemate(king)) {
-                //return true;
-            //}
-           
+    
+            if (stalemate(king)) {
+                return true;
+            }
     
             if (deadPosition(pieces)) {
                 return true;
@@ -517,6 +514,11 @@ public class ChessGame {
         private boolean deadPosition(ArrayList<Piece> pieces) {
             //get number of pieces remaining
             int count = pieces.size();
+    
+            //no need to check for dead position if there are 5 or more pieces
+            if (count >= 5) {
+                return false;
+            }
     
             //check the type of pieces remaining
             for (Piece p : pieces) {
@@ -590,7 +592,6 @@ public class ChessGame {
             }
 
             //king can't escape
-            System.out.println("king can't escape");
             return false;
         }
 
@@ -610,7 +611,6 @@ public class ChessGame {
             }
 
             //piece can't be captured
-            System.out.println("cant be captured");
             return false;
         }
 
@@ -679,15 +679,14 @@ public class ChessGame {
         }
 
         public King getKing() {
-            for (Piece[] pieces : board) {
-                for (Piece p : pieces) {
-                    if (p instanceof King && p.isWhite == isWhiteTurn) {
-                        return (King) p;
-                    }
-                }
+            Point kingPoint;
+            if (isWhiteTurn) {
+                kingPoint = whiteKingLocation;
+                return (King) board[kingPoint.x][kingPoint.y];
+            } else {
+                kingPoint = blackKingLocation;
+                return (King) board[kingPoint.x][kingPoint.y];
             }
-
-            return null;
         }
 
         public boolean canBlockStraightLine(ArrayList<Piece> alliedPieces, Piece checkingPiece, King king, int deltaX, int deltaY) {
