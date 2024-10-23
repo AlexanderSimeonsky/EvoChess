@@ -1,8 +1,6 @@
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-
 import javax.swing.*;
 
 /**
@@ -11,12 +9,12 @@ import javax.swing.*;
 public class ChessGame {
     public static JFrame frame;
     public static JPanel chessBoardPanel; //visual board
-    private Piece selectedPiece;
-    private JPanel previousSquare;  
+    private Piece selectedPiece = null;
+    private JPanel previousSquare = null;  
     private int pieceSize = 105;
     public static Piece[][] board; //logical board
-    public static int turnCounter;
-    public static boolean isWhiteTurn; 
+    public static int turnCounter = 0;
+    public static boolean isWhiteTurn = true; 
     private JLabel turnLabel;
     public static Point whiteKingLocation; //track position of kings
     public static Point blackKingLocation;
@@ -252,10 +250,10 @@ public class ChessGame {
                                         System.out.println("GAMEOVER");
                                         gameEnd("Checkmate");
                                         gameIsOver = true;
-                                    } else if (draw()) {
-                                        gameEnd("Draw");
-                                        gameIsOver = true;
+                                    } else {
+                                        System.out.println("Game continues");
                                     }
+                                    //TODO stalemate
         
                                     // Reset selection after the move
                                     selectedPiece = null;
@@ -317,10 +315,10 @@ public class ChessGame {
                                     System.out.println("GAMEOVER");
                                     gameEnd("Checkmate");
                                     gameIsOver = true;
-                                } else if (draw()) {
-                                    gameEnd("Draw");
-                                    gameIsOver = true;
+                                } else {
+                                    System.out.println("Game continues");
                                 }
+                                //TODO stalemate
     
                                 // Reset selection after the move
                                 selectedPiece = null;
@@ -618,7 +616,7 @@ public class ChessGame {
             return false;
         }
 
-        public static boolean pointInBoard (Point point) {
+        public boolean pointInBoard (Point point) {
             return point.x >= 0 && point.x <= 7 && point.y >= 0 && point.y <= 7; 
         }
 
@@ -771,26 +769,6 @@ public class ChessGame {
             //can't be blocked
             return false;
         }
-
-        private void gameEnd(String message) {
-            JLabel endLabel;
-            
-            if (message == "Checkmate") {
-                endLabel = new JLabel(isWhiteTurn ? "Black WINS! Checkmate!" : "White WINS! Checkmate!");
-            } else {
-                endLabel = new JLabel("DRAW!");
-            }
-
-            endLabel.setForeground(isWhiteTurn ? Color.BLACK : Color.WHITE);
-            endLabel.setFont(new Font("Arial", Font.BOLD, 20));
-            endLabel.setBounds(50, 200, 250, 100);
-            endLabel.setBackground(Color.WHITE);
-            frame.add(endLabel);
-
-            frame.revalidate();
-            frame.repaint();
-        }
-
     }
     
     public static void main(String[] args) {
