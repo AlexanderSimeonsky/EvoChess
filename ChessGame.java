@@ -458,7 +458,7 @@ public class ChessGame {
             } else {
                 //check if any piece can move
                 for (Piece p : alliedPieces) {
-                    if (p.hasLegalMoves()) {
+                    if (p.hasLegalMoves() && !(p instanceof King)) {
                         //piece can move
                         return false;
                     }
