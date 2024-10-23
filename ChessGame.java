@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import javax.swing.*;
 
 /**
@@ -616,7 +617,7 @@ public class ChessGame {
             return false;
         }
 
-        public boolean pointInBoard (Point point) {
+        public static boolean pointInBoard (Point point) {
             return point.x >= 0 && point.x <= 7 && point.y >= 0 && point.y <= 7; 
         }
 
@@ -769,6 +770,25 @@ public class ChessGame {
             //can't be blocked
             return false;
         }
+    }
+
+    private void gameEnd(String message) {
+        JLabel endLabel;
+        
+        if (message == "Checkmate") {
+            endLabel = new JLabel(isWhiteTurn ? "Black WINS! Checkmate!" : "White WINS! Checkmate!");
+        } else {
+            endLabel = new JLabel("DRAW!");
+        }
+
+        endLabel.setForeground(isWhiteTurn ? Color.BLACK : Color.WHITE);
+        endLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        endLabel.setBounds(50, 200, 250, 100);
+        endLabel.setBackground(Color.WHITE);
+        frame.add(endLabel);
+
+        frame.revalidate();
+        frame.repaint();
     }
     
     public static void main(String[] args) {
