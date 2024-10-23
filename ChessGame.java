@@ -458,7 +458,7 @@ public class ChessGame {
             } else {
                 //check if any piece can move
                 for (Piece p : alliedPieces) {
-                    if (p.hasLegalMoves()) {
+                    if (p.hasLegalMoves() && !(p instanceof King)) {
                         //piece can move
                         return false;
                     }
@@ -474,27 +474,7 @@ public class ChessGame {
     
             //check the type of pieces remaining
             for (Piece p : pieces) {
-                if (p instanceof Rook || p instanceof Queen || p instanceof Pawn) {
-                    //can always win if you have a rook or queen or pawn
-                    return false;
-                } else if (p instanceof King) {
-                    if (count == 2) {
-                        //only kings left
-                        return true;
-                    }
-                } else {
-                    //knight or bishop
-                    //check if the remaining 2 non king pieces are of the same colour
-                    for (Piece p2 : pieces) {
-                        if (!(p2 instanceof King) && p2 != p && p2.isWhite == p.isWhite) {
-                            //pieces are same colour can win
-                            return false;
-                        } else {
-                            //pieces are different colour so draw
-                            return true;
-                        }
-                    }
-                }
+                return !(p instanceof Rook || p instanceof Queen || p instanceof Pawn);
             }
     
             //return false as a default
