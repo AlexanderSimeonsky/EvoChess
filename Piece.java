@@ -184,30 +184,41 @@ public class Piece {
     */
     public boolean illegalMove(Point target) {
         // Store the current locations of the pieces
-        Piece targetPiece = ChessGame.board[target.x][target.y]; // Target piece
-        Point originalLocation = new Point(location); // Starting position
+        Piece targetP = ChessGame.board[target.x][target.y]; // Target piece
+        Point spLocation = location; // Starting position
     
         // Fetch the location of the king
-        King king = getKing();
-        if (king == null) {
-            return true; // Illegal move by default if king is null
+        King king = null;
+        if (this instanceof King) {
+            // If the piece being moved is the king, it's the king itself
+            king = (King) this;
+        } else {
+            // Otherwise, get the king based on the turn
+            king = getKing();
         }
     
-        // Simulate the move
-        ChessGame.board[location.x][location.y] = null; // Remove piece from original location
-        ChessGame.board[target.x][target.y] = this; // Place piece at target location
-        location = target; // Update piece's location
+        // Null check: If king is null, it's an invalid board state, return true as an illegal move
+        if (king == null) {
+            return true; // Illegal move by default
+        }
+        
+        // Move the piece temporarily
+        ChessGame.board[target.x][target.y] = null;
+        ChessGame.board[target.x][target.y] = this;
+        ChessGame.board[location.x][location.y] = null;
+        location = target;
     
-        // Check if the king is in check
-        boolean isInCheck = king.isInCheck();
-    
+        // Check if any piece can attack the king
+        boolean check = king.isInCheck(targetP);
+        
         // Revert the move
-        ChessGame.board[target.x][target.y] = targetPiece; // Restore target piece
-        ChessGame.board[originalLocation.x][originalLocation.y] = this; // Restore original piece
-        location = originalLocation; // Restore original location
+        ChessGame.board[target.x][target.y] = targetP;
+        ChessGame.board[spLocation.x][spLocation.y] = this;
+        location = spLocation;
     
         // Return true if the king is in check (indicating an illegal move)
-        return isInCheck;
+        System.out.println("returning " + check);
+        return check;
     }
     
     public King getKing() {
