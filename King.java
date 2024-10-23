@@ -59,8 +59,7 @@ public class King extends Piece{
      * @param target the squre the piece wants to move to
      * @return returns if the move is valid
      */
-    boolean castle(Point target) { //doesnt take into consideration if those squares are pointed/targeted at 
-                                    //by like a bishop or queen
+    boolean castle(Point target) {
         Piece p;
         boolean rookIsLeftOfKing;
 
@@ -169,21 +168,44 @@ public class King extends Piece{
     }
 
     public boolean isInCheck() {
+        System.out.println("KING IS IN CHECK check");
         boolean check = false;
-        for (Piece[] pieces : ChessGame.board) {
-            for (Piece p : pieces) {
-                if (p != null && p.isWhite != isWhite) {
-                    if (p.validCapture(location)) {
-                        check = true; // The king is in check
-                        break;
-                    }
-                }
-            }
-            if (check) {
+        for (Piece p : isWhite ? ChessGame.blackPieces : ChessGame.whitePieces) {
+            if (p.validCapture(location)) {
+                check = true;
+                System.out.println("KING CHEKC TRUE");
                 break;
             }
         }
 
         return check;
+    }
+
+    public boolean isInCheck(Piece p2) {
+        System.out.println("KING IS IN CHECK check");
+        boolean check = false;
+        for (Piece p : isWhite ? ChessGame.blackPieces : ChessGame.whitePieces) {
+            if (p.validCapture(location) && p != p2) {
+                check = true;
+                System.out.println("KING CHEKC TRUE");
+                break;
+            }
+        }
+
+        return check;
+    }
+
+    public Piece getCheckingPiece() {
+        for (Piece[] pieces : ChessGame.board) {
+            for (Piece p : pieces) {
+                if (p != null && p.isWhite != isWhite) {
+                    if (p.validCapture(location) && !p.illegalMove(location)) {
+                        return p;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

@@ -176,6 +176,49 @@ public class Piece {
     boolean hasLegalMoves() {
         return true;
     }
+
+    /**
+    * Method to check if the move is illegal.
+    * @param target needed to simulate the move
+    *  @return returns if the move is illegal
+    */
+    public boolean illegalMove(Point target) {
+        // Store the current locations of the pieces
+        Piece targetPiece = ChessGame.board[target.x][target.y]; // Target piece
+        Point originalLocation = new Point(location); // Starting position
+    
+        // Fetch the location of the king
+        King king = getKing();
+        if (king == null) {
+            return true; // Illegal move by default if king is null
+        }
+    
+        // Simulate the move
+        ChessGame.board[location.x][location.y] = null; // Remove piece from original location
+        ChessGame.board[target.x][target.y] = this; // Place piece at target location
+        location = target; // Update piece's location
+    
+        // Check if the king is in check
+        boolean isInCheck = king.isInCheck();
+    
+        // Revert the move
+        ChessGame.board[target.x][target.y] = targetPiece; // Restore target piece
+        ChessGame.board[originalLocation.x][originalLocation.y] = this; // Restore original piece
+        location = originalLocation; // Restore original location
+    
+        // Return true if the king is in check (indicating an illegal move)
+        return isInCheck;
+    }
+    
+    public King getKing() {
+        for (Piece piece : ChessGame.isWhiteTurn ? ChessGame.whitePieces : ChessGame.blackPieces) {
+            if (piece instanceof King) {
+                return (King) piece;
+            }
+        }
+
+        return null;
+    }
     
 
     void move(Point target) {
