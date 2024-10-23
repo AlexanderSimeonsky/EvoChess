@@ -176,6 +176,60 @@ public class Piece {
     boolean hasLegalMoves() {
         return true;
     }
+
+    /**
+    * Method to check if the move is illegal.
+    * @param target needed to simulate the move
+    *  @return returns if the move is illegal
+    */
+    public boolean illegalMove(Point target) {
+        // Store the current locations of the pieces
+        Piece targetP = ChessGame.board[target.x][target.y]; // Target piece
+        Point spLocation = location; // Starting position
+    
+        // Fetch the location of the king
+        King king = null;
+        if (this instanceof King) {
+            // If the piece being moved is the king, it's the king itself
+            king = (King) this;
+        } else {
+            // Otherwise, get the king based on the turn
+            king = getKing();
+        }
+    
+        // Null check: If king is null, it's an invalid board state, return true as an illegal move
+        if (king == null) {
+            return true; // Illegal move by default
+        }
+        
+        // Move the piece temporarily
+        ChessGame.board[target.x][target.y] = null;
+        ChessGame.board[target.x][target.y] = this;
+        ChessGame.board[location.x][location.y] = null;
+        location = target;
+    
+        // Check if any piece can attack the king
+        boolean check = king.isInCheck(targetP);
+        
+        // Revert the move
+        ChessGame.board[target.x][target.y] = targetP;
+        ChessGame.board[spLocation.x][spLocation.y] = this;
+        location = spLocation;
+    
+        // Return true if the king is in check (indicating an illegal move)
+        System.out.println("returning " + check);
+        return check;
+    }
+    
+    public King getKing() {
+        for (Piece piece : ChessGame.isWhiteTurn ? ChessGame.whitePieces : ChessGame.blackPieces) {
+            if (piece instanceof King) {
+                return (King) piece;
+            }
+        }
+
+        return null;
+    }
     
 
     void move(Point target) {

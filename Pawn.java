@@ -251,7 +251,7 @@ public class Pawn extends Piece {
         //check for piece
         Point forwardMove = new Point(location.x + moveD.x, location.y);
         if (ChessGame.board[forwardMove.x][forwardMove.y] == null) {
-            if (validMove(forwardMove) && !ChessGame.ChessMouseListener.illegalMove(forwardMove, this)) {
+            if (validMove(forwardMove) && !illegalMove(forwardMove)) {
                 //can move
                 return true;
             }
@@ -262,7 +262,7 @@ public class Pawn extends Piece {
             Point newPos = new Point(location.x + d.x, location.y + d.y);
             Piece occupyingPiece = ChessGame.board[newPos.x][newPos.y];
             if (occupyingPiece != null && occupyingPiece.isWhite != isWhite) {
-                if (validCapture(newPos) && !ChessGame.ChessMouseListener.illegalMove(newPos, this)) {
+                if (validCapture(newPos) && !illegalMove(newPos)) {
                     //can capture so can move
                     return true;
                 }
