@@ -2,11 +2,11 @@ import java.awt.*;
 import javax.swing.*;
 
 public class Rook extends Piece {
-    int points = 5;
     boolean hasMoved = false;
 
     Rook(boolean isWhite, Point location) {
         super(isWhite, location);
+        this.points = 5;
     }
 
     @Override
@@ -17,21 +17,18 @@ public class Rook extends Piece {
         }
 
         if (target.x == location.x || target.y == location.y) {
-            //System.out.println("Check if there is blocking piece");
             if (!pieceIsOnStraightLine(target)) {
                 hasMoved = true;
                 return true;
             }
         }
 
-        //System.out.println("Invalid move");
         return false;
     }
 
     @Override
     boolean validCapture(Point target) {
         if (location.equals(target)) {
-            //System.out.println("invalid move");
             return false; // No move if the target is the same as the current location
         }
         
@@ -81,5 +78,67 @@ public class Rook extends Piece {
 
         //no moves
         return false;
+    }
+
+    @Override
+    public Piece pieceEvolves() {
+        if (acquiredPoints >= 2) {
+            //create the evolved piece
+            EvoRook evoRook = new EvoRook(isWhite, location);
+            ChessGame.board[location.x][location.y] = evoRook;
+
+            //remove it from the list of pieces and add the new one
+            if (isWhite) {
+                ChessGame.whitePieces.remove(this);
+                ChessGame.whitePieces.add(evoRook);
+                return evoRook;
+            } else {
+                ChessGame.blackPieces.remove(this);
+                ChessGame.blackPieces.add(evoRook);
+                return evoRook;
+            }
+        } 
+        return null;
+    }
+
+    class EvoRook extends Rook {
+        EvoRook(boolean isWhite, Point location) {
+            super(isWhite, location);
+            this.points = 5;
+        }
+
+        @Override
+        boolean validMove(Point target) {
+            if (location.equals(target)) {
+                return false; // No move if the target is the same as the current location
+            }
+
+            //normal rook moves
+            if (target.x == location.x || target.y == location.y) {
+                if (!pieceIsOnStraightLine(target)) {
+                    hasMoved = true;
+                    return true;
+                }
+            }
+
+            //new moves 1 square diagonally
+            int deltaX = Math.abs(target.x - location.x);
+            int deltaY = Math.abs(target.y - location.y);
+
+            if (deltaX == 1 && deltaY == 1) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        boolean validCapture(Point target) {
+            if (location.equals(target)) {
+                return false; // No move if the target is the same as the current location
+            }
+            
+            return validMove(target);
+        }
+        
     }
 }

@@ -7,20 +7,28 @@ public class Piece {
 
     boolean isWhite;
     Point location;
+    int points;
+    int acquiredPoints;
     
     /**. */
     Piece(boolean isWhite, Point location) {
         this.isWhite = isWhite;
         this.location = location;
+        points = 0;
+        acquiredPoints = 0;
     }
 
 
     boolean validMove(Point target) {
-        return true;
+        return false;
     }
 
     boolean validCapture(Point target) {
-        return true;
+        return false;
+    }
+
+    Piece pieceEvolves() {
+        return null;
     }
 
     /**
