@@ -27,7 +27,6 @@ public class Pawn extends Piece {
         }
 
         if (enPassant(target)) {
-            //System.out.println("Enpassant successful");
             return true;
         }
         
@@ -358,37 +357,17 @@ public class Pawn extends Piece {
             } else if (!isWhite && target.x == 7) {
                 promotion();
             }
-
-            if (enPassant(target)) {
-                return true;
-            }
         
-            int deltaX = target.x - location.x;
+            int deltaX = Math.abs(target.x - location.x);
             int deltaY = Math.abs(target.y - location.y);
 
             if (deltaY != 0) {
-                return false;
+                return false; 
             }
         
-            if (isWhite) {
-                if (location.x == 6 && deltaX == -2) {
-                    if (ChessGame.board[location.x - 1][location.y] == null) {
-                        turnDoubleMoveHappened = ChessGame.turnCounter;
-                        return true;
-                    }
-                }
-
-                return deltaX == -1 || deltaX == 1; //evo pawn move forward and backward
-            } else {
-                if (location.x == 1 && deltaX == 2) {
-                    if (ChessGame.board[location.x + 1][location.y] == null) {
-                        turnDoubleMoveHappened = ChessGame.turnCounter;
-                        return true;
-                    }
-                }
-
-                return deltaX == 1 || deltaX == -1; //evo pawn move forward and backward
-            }
+            //evo pawn move forward and backward
+            //double move is impossible
+            return deltaX == 1;
         }
 
         @Override
@@ -417,6 +396,89 @@ public class Pawn extends Piece {
             }
 
             return false;
+        }
+
+        @Override
+        public Piece pieceEvolves() {
+            //check if evolution criteria is met
+            if (acquiredPoints >= 1) {
+                //create the evolved piece
+                SuperPawn superPawn = new SuperPawn(isWhite, location);
+                ChessGame.board[location.x][location.y] = superPawn;
+
+                //remove it from the list of pieces and add the new one
+                if (isWhite) {
+                    ChessGame.whitePieces.remove(this);
+                    ChessGame.whitePieces.add(superPawn);
+                    return superPawn;
+                } else {
+                    ChessGame.blackPieces.remove(this);
+                    ChessGame.blackPieces.add(superPawn);
+                    return superPawn;
+                }
+            } 
+            return null;
+        }
+
+        class SuperPawn extends EvoPawn {
+            SuperPawn(boolean isWhite, Point location) {
+                super(isWhite, location);
+                this.points = 1;
+            }
+    
+            @Override
+            public boolean validMove(Point target) {
+                if (location.equals(target)) {
+                    return false; // No move if the target is the same as the current location
+                }
+    
+                if (isWhite && target.x == 0) {
+                    promotion();
+                } else if (!isWhite && target.x == 7) {
+                    promotion();
+                }
+            
+                int deltaX = Math.abs(target.x - location.x);
+                int deltaY = Math.abs(target.y - location.y);
+    
+                //double move impossible
+                //can move one square up, down, left, right
+                return (deltaX == 1 || deltaY == 1) && (deltaX + deltaY < 2);
+            }
+    
+            @Override
+            public boolean validCapture(Point target) {
+                if (location.equals(target)) {
+                    return false; // No move if the target is the same as the current location
+                }
+            
+                int deltaX = target.x - location.x;
+                int deltaY = Math.abs(target.y - location.y);
+    
+                if (isWhite) {
+                    if (deltaX == -1 && deltaY == 1) {
+                        if (target.x == 0) {
+                            promotion();
+                        }
+                        return true;
+                    }
+                } else {
+                    if (deltaX == 1 && deltaY == 1) {
+                        if (target.x == 7) {
+                            promotion();
+                        }
+                        return true;
+                    }
+                }
+    
+                return false;
+            }
+
+            @Override
+            public Piece pieceEvolves() {
+                //can't evolve anymore
+                return null;
+            }
         }
     }
 }

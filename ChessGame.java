@@ -603,14 +603,19 @@ public class ChessGame {
             //depending on what piece is doing the check the squares that need
             //to be checked will be different
             if (checkingPiece instanceof Rook) {
+                //no need to check for evolution since the new moves of the rook can't be blocked
                 //straight line
                 return canBlockStraightLine(alliedPieces, checkingPiece, king, deltaX, deltaY);
                 
             } else if (checkingPiece instanceof Bishop) {
+                //no need to check for evolution since the new moves of the bishop can't be blocked
                 //diagonal line
                 return canBlockDiagonalLine(alliedPieces, checkingPiece, king, deltaX, deltaY);
+    
 
             } else if (checkingPiece instanceof Queen) {
+                //no need to check for evolution since the new moves of the queen can't be blocked
+
                 //can be either straight or diagonal
                 if (deltaX == 0 || deltaY == 0) {
                     //straight line
