@@ -1,10 +1,10 @@
 import java.awt.*;
 
 public class Knight extends Piece{
-    int points = 3;
 
     Knight(boolean isWhite, Point location) {
         super(isWhite, location);
+        this.points = 3;
     }
 
     @Override
@@ -82,5 +82,134 @@ public class Knight extends Piece{
 
         //no moves
         return false;
+    }
+
+    @Override
+    public Piece pieceEvolves() {
+        if (acquiredPoints >= 2) {
+            //create the evolved piece
+            EvoKnight evoKnight = new EvoKnight(isWhite, location);
+            ChessGame.board[location.x][location.y] = evoKnight;
+
+            //remove it from the list of pieces and add the new one
+            if (isWhite) {
+                ChessGame.whitePieces.remove(this);
+                ChessGame.whitePieces.add(evoKnight);
+                return evoKnight;
+            } else {
+                ChessGame.blackPieces.remove(this);
+                ChessGame.blackPieces.add(evoKnight);
+                return evoKnight;
+            }
+        } 
+        return null;
+    }
+
+    class EvoKnight extends Knight {
+        EvoKnight(boolean isWhite, Point location) {
+            super(isWhite, location);
+            this.points = 3;
+        }
+
+        @Override
+        public boolean validMove(Point target) {
+            if (location.equals(target)) {
+                return false; // No move if the target is the same as the current location
+            }
+
+            int deltaX = Math.abs(target.x - location.x);
+            int deltaY = Math.abs(target.y - location.y);
+
+            //normal knight move
+            if ((deltaX == 2 && deltaY == 1) || (deltaX == 1 && deltaY == 2)) {
+                return true;
+            }
+
+            //new moves 3x2
+            if ((deltaX == 3 && deltaY == 2) || (deltaX == 2 && deltaY == 3)) {
+                return true;
+            }
+
+            return false;
+        }
+
+        @Override
+        public boolean validCapture(Point target) {
+            if (location.equals(target)) {
+                return false; // No move if the target is the same as the current location
+            }
+            
+            return validMove(target);
+        }
+
+        @Override
+        public Piece pieceEvolves() {
+            if (acquiredPoints >= 4) {
+                //create the evolved piece
+                SuperKnight superKnight = new SuperKnight(isWhite, location);
+                ChessGame.board[location.x][location.y] = superKnight;
+
+                //remove it from the list of pieces and add the new one
+                if (isWhite) {
+                    ChessGame.whitePieces.remove(this);
+                    ChessGame.whitePieces.add(superKnight);
+                    return superKnight;
+                } else {
+                    ChessGame.blackPieces.remove(this);
+                    ChessGame.blackPieces.add(superKnight);
+                    return superKnight;
+                }
+            } 
+            return null;
+        }
+
+        class SuperKnight extends EvoKnight {
+            SuperKnight(boolean isWhite, Point location) {
+                super(isWhite, location);
+                this.points = 3;
+            }
+    
+            @Override
+            public boolean validMove(Point target) {
+                if (location.equals(target)) {
+                    return false; // No move if the target is the same as the current location
+                }
+    
+                int deltaX = Math.abs(target.x - location.x);
+                int deltaY = Math.abs(target.y - location.y);
+    
+                //normal knight move
+                if ((deltaX == 2 && deltaY == 1) || (deltaX == 1 && deltaY == 2)) {
+                    return true;
+                }
+    
+                //evo moves 3x2
+                if ((deltaX == 3 && deltaY == 2) || (deltaX == 2 && deltaY == 3)) {
+                    return true;
+                }
+
+                //super moves 4x3
+                if ((deltaX == 4 && deltaY == 3) || (deltaX == 3 && deltaY == 4)) {
+                    return true;
+                }
+    
+                return false;
+            }
+    
+            @Override
+            public boolean validCapture(Point target) {
+                if (location.equals(target)) {
+                    return false; // No move if the target is the same as the current location
+                }
+                
+                return validMove(target);
+            }
+    
+            @Override
+            public Piece pieceEvolves() {
+                //can't evolve anymore
+                return null;
+            }
+        }
     }
 }

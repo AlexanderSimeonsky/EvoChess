@@ -1,11 +1,10 @@
 import java.awt.*;
-import javax.swing.JPanel;
 
 public class Queen extends Piece {
-    int points = 9;
 
     Queen(boolean isWhite, Point location) {
         super(isWhite, location);
+        this.points = 9;
     }
 
     @Override
@@ -16,7 +15,6 @@ public class Queen extends Piece {
 
         //Vertical and Horizontal movement
         if (target.x == location.x || target.y == location.y) {
-            //System.out.println("Check if there is blocking piece");
             if (!pieceIsOnStraightLine(target)) {
                 return true;
             }
@@ -28,7 +26,6 @@ public class Queen extends Piece {
                 return true;
             }
         }
-        //System.out.println("Invalid move");
         return false;
     }
 
@@ -38,7 +35,6 @@ public class Queen extends Piece {
             return false; // No move if the target is the same as the current location
         }
         
-        //System.out.println("check valid move move");
         return validMove(target);
     }
 
@@ -91,5 +87,153 @@ public class Queen extends Piece {
 
         //no moves
         return false;
+    }
+
+    @Override
+    public Piece pieceEvolves() {
+        if (acquiredPoints >= 4) {
+            //create the evolved piece
+            EvoQueen evoQueen = new EvoQueen(isWhite, location);
+            ChessGame.board[location.x][location.y] = evoQueen;
+
+            //remove it from the list of pieces and add the new one
+            if (isWhite) {
+                ChessGame.whitePieces.remove(this);
+                ChessGame.whitePieces.add(evoQueen);
+                return evoQueen;
+            } else {
+                ChessGame.blackPieces.remove(this);
+                ChessGame.blackPieces.add(evoQueen);
+                return evoQueen;
+            }
+        } 
+        return null;
+    }
+
+    class EvoQueen extends Queen {
+        EvoQueen(boolean isWhite, Point location) {
+            super(isWhite, location);
+            this.points = 9;
+        }
+
+        @Override
+        boolean validMove(Point target) {
+            if (location.equals(target)) {
+                return false; // No move if the target is the same as the current location
+            }
+
+            //Vertical and Horizontal movement
+            if (target.x == location.x || target.y == location.y) {
+                if (!pieceIsOnStraightLine(target)) {
+                    return true;
+                }
+            }
+
+            //Diagonal movement
+            if (Math.abs(target.y - location.y) == Math.abs(target.x - location.x)) {
+                if (!pieceIsOnDiagonalLine(target)) {
+                    return true;
+                }
+            }
+
+            //new moves like a knight
+            int deltaX = Math.abs(target.x - location.x);
+            int deltaY = Math.abs(target.y - location.y);
+
+            if ((deltaX == 2 && deltaY == 1) || (deltaX == 1 && deltaY == 2)) {
+                return true;
+            }
+
+            return false;
+        }
+
+        @Override
+        boolean validCapture(Point target) {
+            if (location.equals(target)) {
+                return false; // No move if the target is the same as the current location
+            }
+        
+            return validMove(target);
+        }
+
+        @Override
+        public Piece pieceEvolves() {
+            if (acquiredPoints >= 6) {
+                //create the evolved piece
+                SuperQueen superQueen = new SuperQueen(isWhite, location);
+                ChessGame.board[location.x][location.y] = superQueen;
+
+                //remove it from the list of pieces and add the new one
+                if (isWhite) {
+                    ChessGame.whitePieces.remove(this);
+                    ChessGame.whitePieces.add(superQueen);
+                    return superQueen;
+                } else {
+                    ChessGame.blackPieces.remove(this);
+                    ChessGame.blackPieces.add(superQueen);
+                    return superQueen;
+                }
+            } 
+            return null;
+        }
+
+        class SuperQueen extends EvoQueen {
+            SuperQueen(boolean isWhite, Point location) {
+                super(isWhite, location);
+                this.points = 9;
+            }
+    
+            @Override
+            boolean validMove(Point target) {
+                if (location.equals(target)) {
+                    return false; // No move if the target is the same as the current location
+                }
+    
+                //Vertical and Horizontal movement
+                if (target.x == location.x || target.y == location.y) {
+                    if (!pieceIsOnStraightLine(target)) {
+                        return true;
+                    }
+                }
+    
+                //Diagonal movement
+                if (Math.abs(target.y - location.y) == Math.abs(target.x - location.x)) {
+                    if (!pieceIsOnDiagonalLine(target)) {
+                        return true;
+                    }
+                }
+    
+                //evo moves like a knight
+                int deltaX = Math.abs(target.x - location.x);
+                int deltaY = Math.abs(target.y - location.y);
+    
+                if ((deltaX == 2 && deltaY == 1) || (deltaX == 1 && deltaY == 2)) {
+                    return true;
+                }
+
+                //super moves anywhere on an empty square
+                if (ChessGame.board[target.x][target.y] == null) {
+                    return true;
+                }
+    
+                return false;
+            }
+    
+            @Override
+            boolean validCapture(Point target) {
+                if (location.equals(target)) {
+                    return false; // No move if the target is the same as the current location
+                }
+            
+                return validMove(target);
+            }
+    
+            @Override
+            public Piece pieceEvolves() {
+                //can't evolve anymore
+                return null;
+            }
+            
+        }
     }
 }

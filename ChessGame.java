@@ -203,6 +203,20 @@ public class ChessGame {
                                 if (selectedPiece.validCapture(point) && !selectedPiece.illegalMove(point)) {
     
                                     //if capture is valid then capture
+
+                                    //update the acquiredPoints field in the piece
+                                    //and check for evolution
+                                    selectedPiece.acquiredPoints += p.points;
+                                    Piece temp;
+                                    if (!(selectedPiece instanceof King)) {
+                                        temp = selectedPiece.pieceEvolves();
+                                        if (temp != null) {
+                                            selectedPiece = temp;                                          
+                                        }
+                                    }
+                                    System.out.println(selectedPiece + " " + selectedPiece.acquiredPoints);
+                                    System.out.println(selectedPiece.points + " " + p.points);
+
                                     //first remove captured piece
                                     clickedSquare.removeAll();
                                     clickedSquare.putClientProperty("piece", null);
@@ -338,7 +352,7 @@ public class ChessGame {
                     }
                     
                 } else {
-                    //2if location has a piece select it and store its location
+                    //if location has a piece select it and store its location
                     if ((Piece) clickedSquare.getClientProperty("piece") != null) {
                         selectedPiece = (Piece) clickedSquare.getClientProperty("piece");
                         previousSquare = clickedSquare;
@@ -427,10 +441,12 @@ public class ChessGame {
     
             King king = getKing();
     
+            //check for stalemate (no leagal moves remaining)
             if (stalemate(king)) {
                 return true;
             }
     
+            //check for dead position (no possible checkmate)
             if (deadPosition(pieces, count)) {
                 return true;
             }
@@ -587,14 +603,19 @@ public class ChessGame {
             //depending on what piece is doing the check the squares that need
             //to be checked will be different
             if (checkingPiece instanceof Rook) {
+                //no need to check for evolution since the new moves of the rook can't be blocked
                 //straight line
                 return canBlockStraightLine(alliedPieces, checkingPiece, king, deltaX, deltaY);
                 
             } else if (checkingPiece instanceof Bishop) {
+                //no need to check for evolution since the new moves of the bishop can't be blocked
                 //diagonal line
                 return canBlockDiagonalLine(alliedPieces, checkingPiece, king, deltaX, deltaY);
+    
 
             } else if (checkingPiece instanceof Queen) {
+                //no need to check for evolution since the new moves of the queen can't be blocked
+
                 //can be either straight or diagonal
                 if (deltaX == 0 || deltaY == 0) {
                     //straight line
@@ -789,10 +810,6 @@ public class ChessGame {
 
         frame.revalidate();
         frame.repaint();
-    }
-    
-    public static void main(String[] args) {
-        new ChessGame();
     }
        
 }
