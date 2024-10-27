@@ -1,7 +1,18 @@
 import java.awt.*;
+import java.util.ArrayList;
 
+/**
+ * Queen class that extends Piece.
+ * Contains movement logic for the Queen piece.
+ * Also contains inner classes for the evolved forms of the Queen piece.
+ */
 public class Queen extends Piece {
 
+    /**
+     * Constructor for the Queen class.
+     * @param isWhite colour of the piece (true if white, false if black)
+     * @param location location of the piece on the board
+     */
     Queen(boolean isWhite, Point location) {
         super(isWhite, location);
         this.points = 9;
@@ -112,6 +123,12 @@ public class Queen extends Piece {
     }
 
     class EvoQueen extends Queen {
+
+        /**
+         * Constructor for the EvoQueen class.
+         * @param isWhite colour of the piece (true if white, false if black)
+         * @param location location of the piece on the board
+         */
         EvoQueen(boolean isWhite, Point location) {
             super(isWhite, location);
             this.points = 9;
@@ -158,9 +175,7 @@ public class Queen extends Piece {
         }
 
         @Override
-        public Piece pieceEvolves() {
-
-        
+        public Piece pieceEvolves() { 
 
             if (acquiredPoints >= 6) {
                 SoundPlayer.playSound("sounds/evolve.wav");
@@ -183,6 +198,12 @@ public class Queen extends Piece {
         }
 
         class SuperQueen extends EvoQueen {
+
+            /**
+             * Constructor for the SuperQueen class.
+             * @param isWhite colour of the piece (true if white, false if black)
+             * @param location location of the piece on the board
+             */
             SuperQueen(boolean isWhite, Point location) {
                 super(isWhite, location);
                 this.points = 9;
@@ -217,11 +238,21 @@ public class Queen extends Piece {
                 }
 
                 //super moves anywhere on an empty square
-                if (ChessGame.board[target.x][target.y] == null) {
-                    return true;
+                ArrayList<Piece> pieces = new ArrayList<Piece>();
+                for (Piece piece : ChessGame.whitePieces) {
+                    pieces.add(piece);
+                }
+                for (Piece piece : ChessGame.blackPieces) {
+                    pieces.add(piece);
+                }
+
+                for (Piece piece : pieces) {
+                    if (piece.location.equals(target)) {
+                        return false;
+                    }
                 }
     
-                return false;
+                return true;
             }
     
             @Override

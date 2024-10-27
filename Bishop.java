@@ -1,14 +1,20 @@
 import java.awt.*;
-
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
- * Class to handle the behaviour of bishops.
+ * Bishop class that extends Piece.
+ * Contains movement logic for the Bishop piece.
+ * Also contains inner classes for the evolved forms of the Bishop piece.
  */
 public class Bishop extends Piece {
 
+    /**
+     * Constructor for the bishop.
+     * @param isWhite colour of the piece (true if white, false if black)
+     * @param location location of the piece on the board
+     */
     Bishop(boolean isWhite, Point location) {
         super(isWhite, location);
         this.points = 3;
@@ -107,6 +113,12 @@ public class Bishop extends Piece {
     }
 
     class EvoBishop extends Bishop {
+
+        /**
+         * Constructor for the evolved bishop.
+         * @param isWhite colour of the piece (true if white, false if black)
+         * @param location location of the piece on the board
+         */
         EvoBishop(boolean isWhite, Point location) {
             super(isWhite, location);
             this.points = 3;

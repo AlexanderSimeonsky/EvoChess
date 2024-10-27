@@ -1,7 +1,15 @@
 import java.awt.*;
 
-public class Knight extends Piece{
+/**
+ * Knight class that extends Piece.
+ */
+public class Knight extends Piece {
 
+    /**
+     * Constructor for the Knight class.
+     * @param isWhite colour of the piece (true if white, false if black)
+     * @param location location of the piece on the board
+     */
     Knight(boolean isWhite, Point location) {
         super(isWhite, location);
         this.points = 3;
@@ -9,9 +17,7 @@ public class Knight extends Piece{
 
     @Override
     boolean validMove(Point target) {
-        //System.out.println("test move");
         if (location.equals(target)) {
-            //System.out.println("invalid move location same as target");
             return false; // No move if the target is the same as the current location
         }
 
@@ -19,18 +25,15 @@ public class Knight extends Piece{
         int deltaY = Math.abs(target.y - location.y);
 
         if ((deltaX == 2 && deltaY == 1) || (deltaX == 1 && deltaY == 2)) {
-            //System.out.println("VALID move");
             return true;
         }
 
-        //System.out.println("invalid move");
         return false;
     }
 
     @Override
     boolean validCapture(Point target) {
         if (location.equals(target)) {
-            //System.out.println("invalid move same target is the same as location");
             return false; // No move if the target is the same as the current location
         }
         
@@ -106,6 +109,12 @@ public class Knight extends Piece{
     }
 
     class EvoKnight extends Knight {
+
+        /**
+         * Constructor for the EvoKnight class.
+         * @param isWhite colour of the piece (true if white, false if black)
+         * @param location location of the piece on the board
+         */
         EvoKnight(boolean isWhite, Point location) {
             super(isWhite, location);
             this.points = 3;
@@ -165,6 +174,12 @@ public class Knight extends Piece{
         }
 
         class SuperKnight extends EvoKnight {
+
+            /**
+             * Constructor for the SuperKnight class.
+             * @param isWhite colour of the piece (true if white, false if black)
+             * @param location location of the piece on the board
+             */
             SuperKnight(boolean isWhite, Point location) {
                 super(isWhite, location);
                 this.points = 3;

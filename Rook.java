@@ -1,9 +1,19 @@
 import java.awt.*;
 import javax.swing.*;
 
+/**
+ * Rook class that extends Piece.
+ * Contains movement logic for the Rook piece.
+ * Also contains inner classes for the evolved forms of the Rook piece.
+ */
 public class Rook extends Piece {
     boolean hasMoved = false;
 
+    /**
+     * Constructor for Rook.
+     * @param isWhite colour of the piece (true if white, false if black)
+     * @param location location of the piece on the board
+     */
     Rook(boolean isWhite, Point location) {
         super(isWhite, location);
         this.points = 5;
@@ -104,10 +114,15 @@ public class Rook extends Piece {
     }
 
     class EvoRook extends Rook {
+
+        /**
+         * Constructor for EvoRook.
+         * @param isWhite colour of the piece (true if white, false if black)
+         * @param location location of the piece on the board
+         */
         EvoRook(boolean isWhite, Point location) {
             super(isWhite, location);
             this.points = 5;
-            this.acquiredPoints = acquiredPoints;
         }
 
         @Override

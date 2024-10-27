@@ -4,11 +4,18 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 /**
- * Pawn class to handle the behaviour of pawns.
+ * Pawn class that extends Piece.
+ * Contains movement logic for the Pawn piece.
+ * Also contains inner classes for the evolved forms of the Pawn piece.
  */
 public class Pawn extends Piece {
     int turnDoubleMoveHappened = 0;
 
+    /**
+     * Constructor for the Pawn class.
+     * @param isWhite colour of the piece (true if white, false if black)
+     * @param location location of the piece on the board
+     */
     Pawn(boolean isWhite, Point location) {
         super(isWhite, location);
         this.points = 1;
@@ -95,32 +102,26 @@ public class Pawn extends Piece {
         if (isWhite) {
             //if white en passant can only happen at row index 3
             if (location.x != 3) {
-                //System.out.println("white can only enpassant on row index 3");
                 return false;
             }
 
             //check for piece one row below target
-            //System.out.println("//check for piece one row below target");
             if (ChessGame.board[target.x - 1][target.y] != null) {
                 if (ChessGame.board[target.x - 1][target.y] instanceof Pawn) {
                     //if piece is pawn check if it moved two squares at once and last turn
-                    //System.out.println("//if pawn check if it moved two squares last turn");
                     Pawn p = (Pawn) ChessGame.board[target.x - 1][target.y];
                     if (p.turnDoubleMoveHappened + 1 == ChessGame.turnCounter) {
                         //if all conditions are valid capture the pawn
-                        //System.out.println("//if all conditions are valid capture the pawn");
                         JPanel temp = ChessGame.chessBoardPanel;
                         JPanel sq = (JPanel) temp.getComponent(8 * (target.x + 1) + target.y);
                         JPanel prevSq = (JPanel) temp.getComponent(target.x * 8 + target.y);
 
                         //remove the captured piece
-                        //System.out.println("//remove the captured piece");
                         sq.removeAll();
                         sq.putClientProperty("piece", null);
                         ChessGame.board[target.x - 1][target.y] = null;
 
                         // Revalidate and repaint the chessboard
-                        //System.out.println("// Revalidate and repaint the chessboard");
                         prevSq.revalidate();
                         sq.revalidate();
                         ChessGame.chessBoardPanel.revalidate();
@@ -134,34 +135,27 @@ public class Pawn extends Piece {
 
         } else {
             //if black en passant can only happen at row index 4
-            //System.out.println("");
             if (location.x != 4) {
-                //System.out.println("black can only enpassant on row index 4");
                 return false;
             }
 
             //check for piece one row above target
-            //System.out.println("//check for piece one row above target");
             if (ChessGame.board[target.x + 1][target.y] != null) {
                 if (ChessGame.board[target.x + 1][target.y] instanceof Pawn) {
                     //if piece is pawn check if it moved two squares at once and last turn
-                    //System.out.println("//if pawn check if it moved two squares last turn");
                     Pawn p = (Pawn) ChessGame.board[target.x + 1][target.y];
                     if (p.turnDoubleMoveHappened + 1 == ChessGame.turnCounter) {
                         //if all conditions are valid capture the pawn
-                        //System.out.println("//if all conditions are valid capture the pawn");
                         JPanel temp = ChessGame.chessBoardPanel;
                         JPanel sq = (JPanel) temp.getComponent(8 * (target.x - 1) + target.y);
                         JPanel prevSq = (JPanel) temp.getComponent(target.x * 8 + target.y);
 
                         //remove the captured piece
-                        //System.out.println("//remove the captured piece");
                         sq.removeAll();
                         sq.putClientProperty("piece", null);
                         ChessGame.board[target.x + 1][target.y] = null;
 
                         // Revalidate and repaint the chessboard
-                        //System.out.println("// Revalidate and repaint the chessboard");
                         prevSq.revalidate();
                         sq.revalidate();
                         ChessGame.chessBoardPanel.revalidate();
@@ -169,18 +163,11 @@ public class Pawn extends Piece {
                         sq.repaint();
 
                         return true;
-                    } else {
-                        //System.out.println("turndoublemoved is different");
                     }
-                } else {
-                    //System.out.println("not a pawn");
                 }
-            } else {
-                //System.out.println("square is null " + ChessGame.board[target.x + 1][target.y]);
             }
         }
 
-        //System.out.println("invalid enpassant");
         return false;
     }
 
@@ -342,6 +329,11 @@ public class Pawn extends Piece {
 
     class EvoPawn extends Pawn {
 
+        /**
+         * Constructor for the EvoPawn class.
+         * @param isWhite colour of the piece (true if white, false if black)
+         * @param location location of the piece on the board
+         */
         EvoPawn(boolean isWhite, Point location) {
             super(isWhite, location);
             this.points = 1;
@@ -423,6 +415,12 @@ public class Pawn extends Piece {
         }
 
         class SuperPawn extends EvoPawn {
+
+            /**
+             * Constructor for the SuperPawn class.
+             * @param isWhite colour of the piece (true if white, false if black)
+             * @param location location of the piece on the board
+             */
             SuperPawn(boolean isWhite, Point location) {
                 super(isWhite, location);
                 this.points = 1;
