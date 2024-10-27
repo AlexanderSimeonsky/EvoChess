@@ -440,9 +440,55 @@ public class ChessGame {
                             selectedPiece = null;
                             previousSquare = null;
                         }
+
+                        displayTutorial(selectedPiece);
                     }
                     
                 }
+            }
+        }
+
+        public void displayTutorial(Piece piece) {
+            BufferedImage tutorialImage = null;
+
+            if (piece instanceof Pawn) {
+                try {
+                    tutorialImage = ImageIO.read(new File("sprites/tutorials/pawnTutorial.jpg"));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            } else if (piece instanceof Bishop) {
+                try {
+                    tutorialImage = ImageIO.read(new File("sprites/tutorials/bishopTutorial.jpg"));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            } else if (piece instanceof Knight) {
+                try {
+                    tutorialImage = ImageIO.read(new File("sprites/tutorials/kightTutorial.jpg"));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            } else if (piece instanceof Rook) {
+                try {
+                    tutorialImage = ImageIO.read(new File("sprites/tutorials/rookTutorial.jpg"));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            } else if (piece instanceof Queen) {
+                try {
+                    tutorialImage = ImageIO.read(new File("sprites/tutorials/queenTutorial.jpg"));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            if (tutorialImage != null) {
+                JLabel tutorialLabel = new JLabel(new ImageIcon(tutorialImage));
+                tutorialLabel.setBounds(1000, 300, 550, 550);
+                frame.add(tutorialLabel);
+                frame.revalidate();
+                frame.repaint();
             }
         }
 
