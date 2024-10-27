@@ -21,11 +21,14 @@ public class ChessGame {
     public static int turnCounter = 0;
     public static boolean isWhiteTurn = true; 
     private JLabel turnLabel;
+    private JLabel scoreLabel;
     public static Point whiteKingLocation; //track position of kings
     public static Point blackKingLocation;
     public boolean gameIsOver;
     public static ArrayList<Piece> whitePieces;
     public static ArrayList<Piece> blackPieces;
+    public int blackscore;
+    public int whitescore;
 
     /**
      * Constructor that begins the game flow.
@@ -41,6 +44,9 @@ public class ChessGame {
         blackPieces = new ArrayList<Piece>(16);
         renderChessboard();
         renderPieces();
+        blackscore = 0;
+        whitescore = 0;
+
 
     
     }
@@ -134,8 +140,17 @@ public class ChessGame {
         turnLabel.setForeground(isWhiteTurn ? white : black);
         turnLabel.setFont(new Font("calibri", Font.BOLD, 20));
         turnLabel.setBounds(1220, 70, 250, 100);
-        turnLabel.setBackground(white);
+        turnLabel.setBackground(black);
+        turnLabel.setForeground(white);
         backgroundPanel.add(turnLabel);
+
+        scoreLabel = new JLabel(whitescore + "-" + blackscore);
+        scoreLabel.setFont(new Font("calibri", Font.BOLD, 120));
+        scoreLabel.setBounds(1195, 115, 500, 200);
+        scoreLabel.setBackground(white);
+        backgroundPanel.add(scoreLabel);
+
+
 
         try {
             BufferedImage buttonImage = ImageIO.read(new File("sprites/MainMenubuttons.png"));
@@ -403,6 +418,8 @@ public class ChessGame {
                                     System.out.println("GAMEOVER");
                                     gameEnd("Checkmate");
                                     gameIsOver = true;
+                                
+
                                 } else {
                                     System.out.println("Game continues");
                                 }
@@ -883,10 +900,17 @@ public class ChessGame {
         } else {
             endLabel = new JLabel("DRAW!");
         }
+        if (isWhiteTurn){
+            blackscore++;
+            scoreLabel.setText(whitescore + "-" + blackscore);
+        } else{
+            whitescore++;
+            scoreLabel.setText(whitescore + "-" + blackscore);
+        }
 
-        endLabel.setForeground(isWhiteTurn ? Color.BLACK : Color.WHITE);
+        endLabel.setForeground(isWhiteTurn ? Color.white : Color.white);
         endLabel.setFont(new Font("Calibri", Font.BOLD, 20));
-        endLabel.setBounds(1160, 100, 250, 100);
+        endLabel.setBounds(1170, 220, 250, 100);
         endLabel.setBackground(Color.WHITE);
         frame.add(endLabel);
 
