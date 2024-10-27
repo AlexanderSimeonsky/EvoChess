@@ -1,7 +1,22 @@
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
-public class Knight extends Piece{
+/**
+ * Knight class that extends Piece.
+ */
+public class Knight extends Piece {
 
+    /**
+     * Constructor for the Knight class.
+     * @param isWhite colour of the piece (true if white, false if black)
+     * @param location location of the piece on the board
+     */
     Knight(boolean isWhite, Point location) {
         super(isWhite, location);
         this.points = 3;
@@ -9,9 +24,7 @@ public class Knight extends Piece{
 
     @Override
     boolean validMove(Point target) {
-        //System.out.println("test move");
         if (location.equals(target)) {
-            //System.out.println("invalid move location same as target");
             return false; // No move if the target is the same as the current location
         }
 
@@ -19,18 +32,15 @@ public class Knight extends Piece{
         int deltaY = Math.abs(target.y - location.y);
 
         if ((deltaX == 2 && deltaY == 1) || (deltaX == 1 && deltaY == 2)) {
-            //System.out.println("VALID move");
             return true;
         }
 
-        //System.out.println("invalid move");
         return false;
     }
 
     @Override
     boolean validCapture(Point target) {
         if (location.equals(target)) {
-            //System.out.println("invalid move same target is the same as location");
             return false; // No move if the target is the same as the current location
         }
         
@@ -90,22 +100,48 @@ public class Knight extends Piece{
             //create the evolved piece
             EvoKnight evoKnight = new EvoKnight(isWhite, location);
             ChessGame.board[location.x][location.y] = evoKnight;
+            String colour;
+            String pieceName;
 
             //remove it from the list of pieces and add the new one
             if (isWhite) {
                 ChessGame.whitePieces.remove(this);
                 ChessGame.whitePieces.add(evoKnight);
-                return evoKnight;
+                colour = "White";
+                pieceName = "evo-white-knight";
             } else {
                 ChessGame.blackPieces.remove(this);
                 ChessGame.blackPieces.add(evoKnight);
-                return evoKnight;
+                colour = "Black";
+                pieceName = "evo-black-knight";
             }
+
+            try {
+                JPanel temp = ChessGame.chessBoardPanel;
+                JPanel square = (JPanel) temp.getComponent(location.x * 8 + location.y);
+                square.removeAll();
+                square.putClientProperty("piece", evoKnight);
+                BufferedImage img = ImageIO.read(new File("sprites/" + colour + "/" + pieceName + ".png"));
+                JLabel tutorialLabel = new JLabel(new ImageIcon(img));
+                square.add(tutorialLabel);
+                square.revalidate();
+                square.repaint();
+            } catch (IOException a) {
+                a.printStackTrace();
+            }
+
+            return evoKnight;
         } 
         return null;
     }
 
     class EvoKnight extends Knight {
+
+        /**
+         * Constructor for the EvoKnight class.
+         * @param isWhite colour of the piece (true if white, false if black)
+         * @param location location of the piece on the board
+         */
         EvoKnight(boolean isWhite, Point location) {
             super(isWhite, location);
             this.points = 3;
@@ -150,21 +186,48 @@ public class Knight extends Piece{
                 ChessGame.board[location.x][location.y] = superKnight;
                 SoundPlayer.playSound("sounds/evolve.wav");
 
+                String colour;
+                String pieceName;
+
                 //remove it from the list of pieces and add the new one
                 if (isWhite) {
                     ChessGame.whitePieces.remove(this);
                     ChessGame.whitePieces.add(superKnight);
-                    return superKnight;
+                    colour = "White";
+                    pieceName = "super-white-knight";
                 } else {
                     ChessGame.blackPieces.remove(this);
                     ChessGame.blackPieces.add(superKnight);
-                    return superKnight;
+                    colour = "Black";
+                    pieceName = "super-black-knight";
                 }
+
+                try {
+                    JPanel temp = ChessGame.chessBoardPanel;
+                    JPanel square = (JPanel) temp.getComponent(location.x * 8 + location.y);
+                    square.removeAll();
+                    square.putClientProperty("piece", superKnight);
+                    BufferedImage img = ImageIO.read(new File("sprites/" + colour + "/" + pieceName + ".png"));
+                    JLabel tutorialLabel = new JLabel(new ImageIcon(img));
+                    square.add(tutorialLabel);
+                    square.revalidate();
+                    square.repaint();
+                } catch (IOException a) {
+                    a.printStackTrace();
+                }
+
+                return superKnight;
             } 
             return null;
         }
 
         class SuperKnight extends EvoKnight {
+
+            /**
+             * Constructor for the SuperKnight class.
+             * @param isWhite colour of the piece (true if white, false if black)
+             * @param location location of the piece on the board
+             */
             SuperKnight(boolean isWhite, Point location) {
                 super(isWhite, location);
                 this.points = 3;

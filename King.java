@@ -2,9 +2,9 @@ import java.awt.*;
 import javax.swing.*;
 
 /**
- * Pawn class to handle the behaviour of kings.
+ * King class to handle the behaviour of kings.
  */
-public class King extends Piece{
+public class King extends Piece {
     int points = 0;
     boolean hasMoved = false;
 
@@ -20,7 +20,6 @@ public class King extends Piece{
 
         if (!hasMoved && Math.abs(target.y - location.y) == 2) {
             if (castle(target)) {
-                //System.out.println("valid castle");
                 return true;
             }
         }
@@ -153,50 +152,54 @@ public class King extends Piece{
 
 
                     return true;
-                } else {
-                    //System.out.println("Invalid castle piece blocking");
-                    return false;
                 }
-            } else {
-                //System.out.println("Invalid castle rook has moved");
-                return false;
             }
-        } else {
-            //System.out.println("Invalid castle corner piece is not a rook");
-            return false;
         }
+        return false;
     }
 
+    /**
+     * Method to check if any piece is checking the king.
+     * @return returns if the king is in check
+     */
     public boolean isInCheck() {
-        System.out.println("KING IS IN CHECK check");
         boolean check = false;
         for (Piece p : isWhite ? ChessGame.blackPieces : ChessGame.whitePieces) {
             if (p.validCapture(location)) {
                 check = true;
-                System.out.println("KING CHEKC TRUE");
                 break;
             }
         }
-        if(check){
+        if (check) {
             SoundPlayer.playSound("sounds/Check.wav");
         }
         return check;
     }
 
+    /**
+     * Method to check if any piece is checking the king without checking a specific piece.
+     * @param p2 the piece to ignore
+     * @return returns if the king is in check
+     */
     public boolean isInCheck(Piece p2) {
-        System.out.println("KING IS IN CHECK check");
         boolean check = false;
         for (Piece p : isWhite ? ChessGame.blackPieces : ChessGame.whitePieces) {
             if (p.validCapture(location) && p != p2) {
                 check = true;
-                System.out.println("KING CHEKC TRUE");
                 break;
-            }
+            }        
+        }
+        if (check) {
+            SoundPlayer.playSound("sounds/Check.wav");
         }
 
         return check;
     }
 
+    /**
+     * Method to get the piece that is checking the king.
+     * @return the piece that is checking the king
+     */
     public Piece getCheckingPiece() {
         for (Piece[] pieces : ChessGame.board) {
             for (Piece p : pieces) {

@@ -44,8 +44,6 @@ public class Piece {
                 for (Piece piece : pieces) {
                     if (piece != null) {
                         if (piece.location.y == col && piece.location.x == target.x) {
-                            //System.out.println("Invalid move piece in the way");
-                            //System.out.println(piece.location + " " + piece);
                             return true;
                         }
                     }
@@ -59,8 +57,6 @@ public class Piece {
                 for (Piece piece : pieces) {
                     if (piece != null) {
                         if (piece.location.y == col && piece.location.x == target.x) {
-                            //System.out.println("Invalid move piece in the way");
-                            //System.out.println(piece.location + " " + piece);
                             return true;
                         }
                     }
@@ -74,8 +70,6 @@ public class Piece {
                 for (Piece piece : pieces) {
                     if (piece != null) {
                         if (piece.location.y == target.y && piece.location.x == row) {
-                            //System.out.println("Invalid move piece in the way");
-                            //System.out.println(piece.location + " " + piece);
                             return true;
                         }
                     }
@@ -89,8 +83,6 @@ public class Piece {
                 for (Piece piece : pieces) {
                     if (piece != null) {
                         if (piece.location.y == target.y && piece.location.x == row) {
-                            //System.out.println("Invalid move piece in the way");
-                            //System.out.println(piece.location + " " + piece);
                             return true;
                         }
                     }
@@ -98,7 +90,6 @@ public class Piece {
             }
         }
 
-        //System.out.println("No piece in the way valid move");
         return false;
     }
 
@@ -117,8 +108,6 @@ public class Piece {
                     for (Piece piece : pieces) {
                         if (piece != null) {
                             if (piece.location.y == col && piece.location.x == location.x - diff) {
-                                //System.out.println("Invalid move piece in the way");
-                                System.out.println(piece.location + " " + piece);
                                 return true;
                             }
                         }
@@ -133,8 +122,6 @@ public class Piece {
                     for (Piece piece : pieces) {
                         if (piece != null) {
                             if (piece.location.y == col && piece.location.x == location.x - diff) {
-                                //System.out.println("Invalid move piece in the way");
-                                //System.out.println(piece.location + " " + piece);
                                 return true;
                             }
                         }
@@ -151,8 +138,6 @@ public class Piece {
                     for (Piece piece : pieces) {
                         if (piece != null) {
                             if (piece.location.y == col && piece.location.x == location.x + diff) {
-                                //System.out.println("Invalid move piece in the way");
-                                //System.out.println(piece.location + " " + piece);
                                 return true;
                             }
                         }
@@ -167,8 +152,6 @@ public class Piece {
                     for (Piece piece : pieces) {
                         if (piece != null) {
                             if (piece.location.y == col && piece.location.x == location.x + diff) {
-                                //System.out.println("Invalid move piece in the way");
-                                //System.out.println(piece.location + " " + piece);
                                 return true;
                             }
                         }
@@ -177,7 +160,6 @@ public class Piece {
             }
         }
 
-        //System.out.println("No piece in the way valid move");
         return false;
     }
 
@@ -225,10 +207,13 @@ public class Piece {
         location = spLocation;
     
         // Return true if the king is in check (indicating an illegal move)
-        System.out.println("returning " + check);
         return check;
     }
     
+    /**
+     * Method to get the king.
+     * @return returns the king
+     */
     public King getKing() {
         for (Piece piece : ChessGame.isWhiteTurn ? ChessGame.whitePieces : ChessGame.blackPieces) {
             if (piece instanceof King) {
@@ -238,7 +223,6 @@ public class Piece {
 
         return null;
     }
-    
 
     void move(Point target) {
         location = target;

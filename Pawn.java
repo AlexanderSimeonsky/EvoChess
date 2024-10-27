@@ -1,14 +1,26 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
+
 /**
- * Pawn class to handle the behaviour of pawns.
+ * Pawn class that extends Piece.
+ * Contains movement logic for the Pawn piece.
+ * Also contains inner classes for the evolved forms of the Pawn piece.
  */
 public class Pawn extends Piece {
     int turnDoubleMoveHappened = 0;
 
+    /**
+     * Constructor for the Pawn class.
+     * @param isWhite colour of the piece (true if white, false if black)
+     * @param location location of the piece on the board
+     */
     Pawn(boolean isWhite, Point location) {
         super(isWhite, location);
         this.points = 1;
@@ -95,32 +107,26 @@ public class Pawn extends Piece {
         if (isWhite) {
             //if white en passant can only happen at row index 3
             if (location.x != 3) {
-                //System.out.println("white can only enpassant on row index 3");
                 return false;
             }
 
             //check for piece one row below target
-            //System.out.println("//check for piece one row below target");
             if (ChessGame.board[target.x - 1][target.y] != null) {
                 if (ChessGame.board[target.x - 1][target.y] instanceof Pawn) {
                     //if piece is pawn check if it moved two squares at once and last turn
-                    //System.out.println("//if pawn check if it moved two squares last turn");
                     Pawn p = (Pawn) ChessGame.board[target.x - 1][target.y];
                     if (p.turnDoubleMoveHappened + 1 == ChessGame.turnCounter) {
                         //if all conditions are valid capture the pawn
-                        //System.out.println("//if all conditions are valid capture the pawn");
                         JPanel temp = ChessGame.chessBoardPanel;
                         JPanel sq = (JPanel) temp.getComponent(8 * (target.x + 1) + target.y);
                         JPanel prevSq = (JPanel) temp.getComponent(target.x * 8 + target.y);
 
                         //remove the captured piece
-                        //System.out.println("//remove the captured piece");
                         sq.removeAll();
                         sq.putClientProperty("piece", null);
                         ChessGame.board[target.x - 1][target.y] = null;
 
                         // Revalidate and repaint the chessboard
-                        //System.out.println("// Revalidate and repaint the chessboard");
                         prevSq.revalidate();
                         sq.revalidate();
                         ChessGame.chessBoardPanel.revalidate();
@@ -134,34 +140,27 @@ public class Pawn extends Piece {
 
         } else {
             //if black en passant can only happen at row index 4
-            //System.out.println("");
             if (location.x != 4) {
-                //System.out.println("black can only enpassant on row index 4");
                 return false;
             }
 
             //check for piece one row above target
-            //System.out.println("//check for piece one row above target");
             if (ChessGame.board[target.x + 1][target.y] != null) {
                 if (ChessGame.board[target.x + 1][target.y] instanceof Pawn) {
                     //if piece is pawn check if it moved two squares at once and last turn
-                    //System.out.println("//if pawn check if it moved two squares last turn");
                     Pawn p = (Pawn) ChessGame.board[target.x + 1][target.y];
                     if (p.turnDoubleMoveHappened + 1 == ChessGame.turnCounter) {
                         //if all conditions are valid capture the pawn
-                        //System.out.println("//if all conditions are valid capture the pawn");
                         JPanel temp = ChessGame.chessBoardPanel;
                         JPanel sq = (JPanel) temp.getComponent(8 * (target.x - 1) + target.y);
                         JPanel prevSq = (JPanel) temp.getComponent(target.x * 8 + target.y);
 
                         //remove the captured piece
-                        //System.out.println("//remove the captured piece");
                         sq.removeAll();
                         sq.putClientProperty("piece", null);
                         ChessGame.board[target.x + 1][target.y] = null;
 
                         // Revalidate and repaint the chessboard
-                        //System.out.println("// Revalidate and repaint the chessboard");
                         prevSq.revalidate();
                         sq.revalidate();
                         ChessGame.chessBoardPanel.revalidate();
@@ -169,18 +168,11 @@ public class Pawn extends Piece {
                         sq.repaint();
 
                         return true;
-                    } else {
-                        //System.out.println("turndoublemoved is different");
                     }
-                } else {
-                    //System.out.println("not a pawn");
                 }
-            } else {
-                //System.out.println("square is null " + ChessGame.board[target.x + 1][target.y]);
             }
         }
 
-        //System.out.println("invalid enpassant");
         return false;
     }
 
@@ -326,22 +318,48 @@ public class Pawn extends Piece {
             EvoPawn evoPawn = new EvoPawn(isWhite, location);
             ChessGame.board[location.x][location.y] = evoPawn;
 
+            String colour;
+            String pieceName;
+
             //remove it from the list of pieces and add the new one
             if (isWhite) {
                 ChessGame.whitePieces.remove(this);
                 ChessGame.whitePieces.add(evoPawn);
-                return evoPawn;
+                colour = "White";
+                pieceName = "evo-white-pawn";
             } else {
                 ChessGame.blackPieces.remove(this);
                 ChessGame.blackPieces.add(evoPawn);
-                return evoPawn;
+                colour = "Black";
+                pieceName = "evo-black-pawn";
             }
+
+            try {
+                JPanel temp = ChessGame.chessBoardPanel;
+                JPanel square = (JPanel) temp.getComponent(location.x * 8 + location.y);
+                square.removeAll();
+                square.putClientProperty("piece", evoPawn);
+                BufferedImage img = ImageIO.read(new File("sprites/" + colour + "/" + pieceName + ".png"));
+                JLabel tutorialLabel = new JLabel(new ImageIcon(img));
+                square.add(tutorialLabel);
+                square.revalidate();
+                square.repaint();
+            } catch (IOException a) {
+                a.printStackTrace();
+            }
+
+            return evoPawn;
         } 
         return null;
     }
 
     class EvoPawn extends Pawn {
 
+        /**
+         * Constructor for the EvoPawn class.
+         * @param isWhite colour of the piece (true if white, false if black)
+         * @param location location of the piece on the board
+         */
         EvoPawn(boolean isWhite, Point location) {
             super(isWhite, location);
             this.points = 1;
@@ -408,21 +426,48 @@ public class Pawn extends Piece {
                 SuperPawn superPawn = new SuperPawn(isWhite, location);
                 ChessGame.board[location.x][location.y] = superPawn;
 
+                String colour;
+                String pieceName;
+
                 //remove it from the list of pieces and add the new one
                 if (isWhite) {
                     ChessGame.whitePieces.remove(this);
                     ChessGame.whitePieces.add(superPawn);
-                    return superPawn;
+                    colour = "White";
+                    pieceName = "super-white-pawn";
                 } else {
                     ChessGame.blackPieces.remove(this);
                     ChessGame.blackPieces.add(superPawn);
-                    return superPawn;
+                    colour = "Black";
+                    pieceName = "super-black-pawn";
+                }   
+
+                try {
+                    JPanel temp = ChessGame.chessBoardPanel;
+                    JPanel square = (JPanel) temp.getComponent(location.x * 8 + location.y);
+                    square.removeAll();
+                    square.putClientProperty("piece", superPawn);
+                    BufferedImage img = ImageIO.read(new File("sprites/" + colour + "/" + pieceName + ".png"));
+                    JLabel tutorialLabel = new JLabel(new ImageIcon(img));
+                    square.add(tutorialLabel);
+                    square.revalidate();
+                    square.repaint();
+                } catch (IOException a) {
+                    a.printStackTrace();
                 }
+
+                return superPawn;
             } 
             return null;
         }
 
         class SuperPawn extends EvoPawn {
+
+            /**
+             * Constructor for the SuperPawn class.
+             * @param isWhite colour of the piece (true if white, false if black)
+             * @param location location of the piece on the board
+             */
             SuperPawn(boolean isWhite, Point location) {
                 super(isWhite, location);
                 this.points = 1;

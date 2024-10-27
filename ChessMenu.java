@@ -1,11 +1,16 @@
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
+
+/**
+ * This class creates a full-screen menu for the chess game. 
+ * The menu has three buttons: Start, Quit, and Tutorial.
+ */
 public class ChessMenu {
     // Variables to hold the background image and buttons
     private static BufferedImage backgroundImage;
@@ -14,7 +19,10 @@ public class ChessMenu {
     private static JButton tutorialButton;
     
 
-    // Function that creates and activates the ChessGame instance
+    /**
+     * Function that creates and activates the ChessGame instance.
+     * @param frame The JFrame to dispose of after the game is activated
+     */
     public static void activateChessGame(JFrame frame) {
         // Start the chess game
         new ChessGame();  // Create and "activate" the ChessGame
@@ -26,7 +34,10 @@ public class ChessMenu {
     }
     
 
-    // Function that opens the tutorial image in full screen
+    /**
+     * Function that opens the tutorial image in full screen.
+     * @param previousFrame The JFrame to dispose of after the tutorial is closed
+     */
     public static void openTutorial(JFrame previousFrame) {
         JFrame tutorialFrame = new JFrame("Tutorial");
         tutorialFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -47,7 +58,8 @@ public class ChessMenu {
             int screenWidth = screenSize.width;
             int screenHeight = screenSize.height;
     
-            int scaledWidth, scaledHeight;
+            int scaledWidth;
+            int scaledHeight;
             if (imgAspectRatio > (double) screenWidth / screenHeight) {
                 scaledWidth = screenWidth;
                 scaledHeight = (int) (screenWidth / imgAspectRatio);
@@ -96,7 +108,9 @@ public class ChessMenu {
         }
     }
     
-    // Create the full-screen menu GUI
+    /**
+     * Create the full-screen menu GUI.
+     */
     public static void createMenu() {
         try {
             backgroundImage = ImageIO.read(new File("sprites/MainMenu.jpg"));
@@ -127,94 +141,92 @@ public class ChessMenu {
         positionButtons(panel);
     }
 
-private static void placeComponents(JPanel panel, JFrame frame) {
-    startButton = new JButton();
-    try {
-        ImageIcon buttonIcon = new ImageIcon(ImageIO.read(new File("sprites/MainMenubuttons.png")));
-        Image scaledImage = buttonIcon.getImage().getScaledInstance(-1, 55, Image.SCALE_SMOOTH);
-        startButton.setIcon(new ImageIcon(scaledImage));
-        startButton.setContentAreaFilled(false);
-        startButton.setBorderPainted(false);
-        startButton.setFocusPainted(false);
-        startButton.setFocusable(false);
-        panel.add(startButton);
+    private static void placeComponents(JPanel panel, JFrame frame) {
+        startButton = new JButton();
+        try {
+            ImageIcon buttonIcon = new ImageIcon(ImageIO.read(new File("sprites/MainMenubuttons.png")));
+            Image scaledImage = buttonIcon.getImage().getScaledInstance(-1, 55, Image.SCALE_SMOOTH);
+            startButton.setIcon(new ImageIcon(scaledImage));
+            startButton.setContentAreaFilled(false);
+            startButton.setBorderPainted(false);
+            startButton.setFocusPainted(false);
+            startButton.setFocusable(false);
+            panel.add(startButton);
 
-        startButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SoundPlayer.playSound("sounds/open.wav");
-                activateChessGame(frame);
-                
+            startButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    SoundPlayer.playSound("sounds/open.wav");
+                    activateChessGame(frame);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-            }
-        });
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
+        quitButton = new JButton();
+        try {
+            ImageIcon quitIcon = new ImageIcon(ImageIO.read(new File("sprites/MainMenubuttons.png")));
+            Image scaledQuitImage = quitIcon.getImage().getScaledInstance(-1, 55, Image.SCALE_SMOOTH);
+            quitButton.setIcon(new ImageIcon(scaledQuitImage));
+            quitButton.setContentAreaFilled(false);
+            quitButton.setBorderPainted(false);
+            quitButton.setFocusPainted(false);
+            quitButton.setFocusable(false);
+            panel.add(quitButton);
 
-    quitButton = new JButton();
-    try {
-        ImageIcon quitIcon = new ImageIcon(ImageIO.read(new File("sprites/MainMenubuttons.png")));
-        Image scaledQuitImage = quitIcon.getImage().getScaledInstance(-1, 55, Image.SCALE_SMOOTH);
-        quitButton.setIcon(new ImageIcon(scaledQuitImage));
-        quitButton.setContentAreaFilled(false);
-        quitButton.setBorderPainted(false);
-        quitButton.setFocusPainted(false);
-        quitButton.setFocusable(false);
-        panel.add(quitButton);
+            quitButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    SoundPlayer.playSound("sounds/close.wav");
+                    System.exit(0);
+                }   
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        quitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SoundPlayer.playSound("sounds/close.wav");
-                System.exit(0);
-            }
-        });
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-
-    tutorialButton = new JButton();
-    try {
-        ImageIcon tutorialIcon = new ImageIcon(ImageIO.read(new File("sprites/MainMenubuttons.png")));
-        Image scaledTutorialImage = tutorialIcon.getImage().getScaledInstance(-1, 55, Image.SCALE_SMOOTH);
-        tutorialButton.setIcon(new ImageIcon(scaledTutorialImage));
+        tutorialButton = new JButton();
+        try {
+            ImageIcon tutorialIcon = new ImageIcon(ImageIO.read(new File("sprites/MainMenubuttons.png")));
+            Image scaledTutorialImage = tutorialIcon.getImage().getScaledInstance(-1, 55, Image.SCALE_SMOOTH);
+            tutorialButton.setIcon(new ImageIcon(scaledTutorialImage));
 
 
-        tutorialButton.setOpaque(false);
-        tutorialButton.setContentAreaFilled(false);
-        tutorialButton.setBorderPainted(false);
-        tutorialButton.setFocusPainted(false);
-        tutorialButton.setFocusable(false);
+            tutorialButton.setOpaque(false);
+            tutorialButton.setContentAreaFilled(false);
+            tutorialButton.setBorderPainted(false);
+            tutorialButton.setFocusPainted(false);
+            tutorialButton.setFocusable(false);
         
-        panel.add(tutorialButton);
+            panel.add(tutorialButton);
 
-        tutorialButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SoundPlayer.playSound("sounds/open.wav");
-                openTutorial(frame);
-            }
-        });
-    } catch (IOException e) {
-        e.printStackTrace();
+            tutorialButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    SoundPlayer.playSound("sounds/open.wav");
+                    openTutorial(frame);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-}
 
 
     // Function to position buttons as specified
     private static void positionButtons(JPanel panel) {
         if (startButton != null && quitButton != null && tutorialButton != null) {
             int startX = (panel.getWidth() - startButton.getPreferredSize().width) / 2;
-            int startY = (panel.getHeight() - startButton.getPreferredSize().height)/ 2 - 104;
+            int startY = (panel.getHeight() - startButton.getPreferredSize().height) / 2 - 104;
             startButton.setBounds(startX, startY, startButton.getPreferredSize().width, startButton.getPreferredSize().height);
 
-            int quitX = (panel.getWidth() - quitButton.getPreferredSize().width ) / 2;
-            int quitY = (panel.getHeight() - startButton.getPreferredSize().height)/ 2 + 50;
+            int quitX = (panel.getWidth() - quitButton.getPreferredSize().width) / 2;
+            int quitY = (panel.getHeight() - startButton.getPreferredSize().height) / 2 + 50;
             quitButton.setBounds(quitX, quitY, quitButton.getPreferredSize().width, quitButton.getPreferredSize().height);
 
             int tutorialX = (panel.getWidth() - tutorialButton.getPreferredSize().width) / 2;
-            int tutorialY = (panel.getHeight() - startButton.getPreferredSize().height) / 2 -30;
+            int tutorialY = (panel.getHeight() - startButton.getPreferredSize().height) / 2 - 30;
             tutorialButton.setBounds(tutorialX, tutorialY, tutorialButton.getPreferredSize().width, tutorialButton.getPreferredSize().height);
         }
     }

@@ -1,12 +1,12 @@
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import javax.imageio.ImageIO;
 import java.io.IOException;
+import java.util.ArrayList;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
 /**
  * Class to handle the game flow.
@@ -29,6 +29,7 @@ public class ChessGame {
     public static ArrayList<Piece> blackPieces;
     public int blackscore;
     public int whitescore;
+    JLabel tutorialLabel;
 
     /**
      * Constructor that begins the game flow.
@@ -46,17 +47,16 @@ public class ChessGame {
         renderPieces();
         blackscore = 0;
         whitescore = 0;
-
-
-    
     }
 
+    /**
+     * Method to activate the chess menu.
+     * @param frame The frame to dispose of.
+     */
     public static void activateChessMenu(JFrame frame) {
-
         SoundPlayer.playSound("sounds/close.wav");
-        
-
-        new ChessMenu().createMenu();  
+        new ChessMenu();
+        ChessMenu.createMenu();  
     
         // Set up a timer to dispose of the menu frame after 0.5 seconds
         Timer timer = new Timer(500, event -> frame.dispose());
@@ -78,7 +78,6 @@ public class ChessGame {
             backgroundImage = ImageIO.read(new File("sprites/GameBackground.jpg"));
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Error: Background image not found.");
             return; // Exit the method if the image can't be loaded
         }
     
@@ -129,9 +128,7 @@ public class ChessGame {
                 int screenWidth = frame.getWidth();
                 int screenHeight = frame.getHeight();
                 int newSize = Math.min(screenWidth, screenHeight) - 100;
-                chessBoardPanel.setBounds((screenWidth - newSize) - 1325 / 2, (screenHeight - newSize) / 2, newSize, newSize);
-                
-                
+                chessBoardPanel.setBounds((screenWidth - newSize) - 1325 / 2, (screenHeight - newSize) / 2, newSize, newSize);              
             }
         });
     
@@ -150,8 +147,6 @@ public class ChessGame {
         scoreLabel.setBackground(white);
         backgroundPanel.add(scoreLabel);
 
-
-
         try {
             BufferedImage buttonImage = ImageIO.read(new File("sprites/MainMenubuttons.png"));
             JButton backToMenuButton = new JButton(new ImageIcon(buttonImage));
@@ -163,7 +158,6 @@ public class ChessGame {
             backgroundPanel.add(backToMenuButton);
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Error: Button image not found.");
         }
 
         try {
@@ -178,7 +172,6 @@ public class ChessGame {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     
         // Trigger initial layout
         frame.dispatchEvent(new java.awt.event.ComponentEvent(frame, java.awt.event.ComponentEvent.COMPONENT_RESIZED));
@@ -254,9 +247,17 @@ public class ChessGame {
         
     }
 
+    /**
+     * Class to handle mouse events on the chessboard.
+     * Also includes logic of movement and game end conditions.
+     */
     public class ChessMouseListener extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
+            if (tutorialLabel != null) {
+                frame.remove(tutorialLabel);
+            }
+            
             if (!gameIsOver) {
                 JPanel clickedSquare = (JPanel) e.getSource();
     
@@ -270,10 +271,6 @@ public class ChessGame {
                         //if it is not the same square check if there is a piece on the square
                         if (clickedSquare.getClientProperty("piece") != null) {
                             //if there is a piece store it
-                            int pieceIndex = chessBoardPanel.getComponentZOrder(clickedSquare);
-                            int pieceRow = pieceIndex / 8;
-                            int pieceCol = pieceIndex % 8;
-                            //Piece p = board[pieceRow][pieceCol];
                             Piece p = (Piece) clickedSquare.getClientProperty("piece");
     
                             //check the colour
@@ -295,13 +292,12 @@ public class ChessGame {
                                             selectedPiece = temp;                                          
                                         }
                                     }
-                                    System.out.println(selectedPiece + " " + selectedPiece.acquiredPoints);
-                                    System.out.println(selectedPiece.points + " " + p.points);
 
                                     //first remove captured piece
                                     clickedSquare.removeAll();
                                     clickedSquare.putClientProperty("piece", null);
                                     board[p.location.x][p.location.y] = null;
+                                    
                                     if (p.isWhite) {
                                         whitePieces.remove(p);
                                     } else {
@@ -340,17 +336,17 @@ public class ChessGame {
                                     //change piece turn
                                     isWhiteTurn = !isWhiteTurn;
                                     turnLabel.setText(isWhiteTurn ? "White's turn" : "Black's turn");
-                                    System.out.println("valid move");
 
                                     //check for game end
                                     if (checkMate()) {
-                                        System.out.println("GAMEOVER");
                                         gameEnd("Checkmate");
                                         gameIsOver = true;
-                                    } else {
-                                        System.out.println("Game continues");
                                     }
-                                    //TODO stalemate
+
+                                    if (draw()) {
+                                        gameEnd("Draw");
+                                        gameIsOver = true;
+                                    }
         
                                     // Reset selection after the move
                                     selectedPiece = null;
@@ -361,7 +357,6 @@ public class ChessGame {
                             } else {
                                 //if it is the same colour then deselect the pieces
                                 
-                                System.out.println("invalid move");
                                 previousSquare = null;
                                 selectedPiece = null;
                             }
@@ -380,7 +375,7 @@ public class ChessGame {
                                 clickedSquare.putClientProperty("piece", selectedPiece);
                                 board[targetRow][targetCol] = selectedPiece;
                                 selectedPiece.move(new Point(targetRow, targetCol));
-                                if (isWhiteTurn){
+                                if (isWhiteTurn) {
                                     SoundPlayer.playSound("sounds/whiteMove.wav");
                                 } else {
                                     SoundPlayer.playSound("sounds/blackMove.wav");
@@ -411,19 +406,16 @@ public class ChessGame {
                                 isWhiteTurn = !isWhiteTurn;
                                 turnLabel.setText(isWhiteTurn ? "White's turn" : "Black's turn");
 
-                                System.out.println("valid move");
-
                                 //check for game end
                                 if (checkMate()) {
-                                    System.out.println("GAMEOVER");
                                     gameEnd("Checkmate");
                                     gameIsOver = true;
-                                
+                                } 
 
-                                } else {
-                                    System.out.println("Game continues");
+                                if (draw()) {
+                                    gameEnd("Draw");
+                                    gameIsOver = true;
                                 }
-                                //TODO stalemate
     
                                 // Reset selection after the move
                                 selectedPiece = null;
@@ -433,13 +425,10 @@ public class ChessGame {
                             } else {
                                 //if it is not valid then deselect it and the square
                                 SoundPlayer.playSound("sounds/illegal.wav");
-                                System.out.println("move invalid");
                                 previousSquare = null;
                                 selectedPiece = null;
                             }
                         }
-    
-    
                     }
                     
                 } else {
@@ -447,7 +436,6 @@ public class ChessGame {
                     if ((Piece) clickedSquare.getClientProperty("piece") != null) {
                         selectedPiece = (Piece) clickedSquare.getClientProperty("piece");
                         previousSquare = clickedSquare;
-                        System.out.println(selectedPiece);
     
                         //check whos turn it is
                         if (isWhiteTurn && !selectedPiece.isWhite) {
@@ -456,62 +444,89 @@ public class ChessGame {
                         } else if (!isWhiteTurn && selectedPiece.isWhite) {
                             selectedPiece = null;
                             previousSquare = null;
-                        } else {
-                            
-                                
-
-                            
                         }
 
-                        System.out.println("piece selected");
+                        displayTutorial(selectedPiece);
                     }
                     
                 }
-    
-                System.out.println();
-                System.out.println("end");
-                System.out.println();
             }
         }
 
+        public void displayTutorial(Piece piece) {
+            BufferedImage tutorialImage = null;
+
+            if (piece instanceof Pawn) {
+                try {
+                    tutorialImage = ImageIO.read(new File("sprites/tutorials/pawnTutorial.jpg"));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            } else if (piece instanceof Bishop) {
+                try {
+                    tutorialImage = ImageIO.read(new File("sprites/tutorials/bishopTutorial.jpg"));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            } else if (piece instanceof Knight) {
+                try {
+                    tutorialImage = ImageIO.read(new File("sprites/tutorials/kightTutorial.jpg"));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            } else if (piece instanceof Rook) {
+                try {
+                    tutorialImage = ImageIO.read(new File("sprites/tutorials/rookTutorial.jpg"));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            } else if (piece instanceof Queen) {
+                try {
+                    tutorialImage = ImageIO.read(new File("sprites/tutorials/queenTutorial.jpg"));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            if (tutorialImage != null) {
+                JLabel tutorial = new JLabel(new ImageIcon(tutorialImage));
+                tutorial.setBounds(1000, 300, 550, 550);
+                tutorialLabel = tutorial;
+                frame.add(tutorialLabel);
+                frame.revalidate();
+                frame.repaint();
+            }
+        }
+
+        /**
+         * Method to check for checkmate.
+         * @return True if checkmate, false otherwise.
+         */
         public boolean checkMate() {
             //get the location of the king
-            System.out.println("CHECKMATE CHECK");
             King king = getKing();
 
             //check if there is an active check
             if (king.isInCheck()) {
                 //if yes check for possible moves
                 //option 1 king can move
-                System.out.println();
-                System.out.println("king can escape check");
-                System.out.println();
+
                 if (kingCanEscape(king)) {
-                    System.out.println("King can escape");
                     return false;
                 }
 
-                System.out.println();
-                System.out.println("piece can be captured check");
-                System.out.println();
                 //option 2 checking piece can be captured
                 if (checkingPieceCanBeCaptured(king)) {
-                    System.out.println("piece can be captured");
                     return false;
                 }
 
-                System.out.println();
-                System.out.println("piece can be blocked check");
-                System.out.println();
                 //option 3 check can be blocked
                 if (checkCanBeBlocked(king)) {
-                    System.out.println("piece can be blocked");
                     return false;
                 }
                 
             } else {
                 //king is not in check and so checkmate is impossible
-                System.out.println("king not in check");
                 return false;
             }
             
@@ -519,6 +534,10 @@ public class ChessGame {
             return true;
         }
 
+        /**
+         * Method to check for draw.
+         * @return True if draw, false otherwise.
+         */
         private boolean draw() {
             ArrayList<Piece> pieces = new ArrayList<Piece>();
     
@@ -557,7 +576,6 @@ public class ChessGame {
             //check if king can move
             if (kingCanEscape(king)) {
                 //king can move
-                System.out.println("King can escape");
                 return false;
             }
     
@@ -579,7 +597,6 @@ public class ChessGame {
             }
     
             //no piece can move so stalemate
-            System.out.println("No piece can move");
             SoundPlayer.playSound("sounds/close.wav");
             return true;
         }
@@ -588,36 +605,19 @@ public class ChessGame {
     
             //check the type of pieces remaining
             for (Piece p : pieces) {
-                if (p instanceof Rook || p instanceof Queen || p instanceof Pawn) {
-                    //can always win if you have a rook or queen or pawn
-                    return false;
-                } else if (p instanceof King) {
-                    if (count == 2) {
-                        //only kings left
-                        return true;
-                    }
-                } else {
-                    //knight or bishop
-                    //check if the remaining 2 non king pieces are of the same colour
-                    for (Piece p2 : pieces) {
-                        if (!(p2 instanceof King) && p2 != p && p2.isWhite == p.isWhite) {
-                            //pieces are same colour can win
-                            return false;
-                        } else {
-                            //pieces are different colour so draw
-                            return true;
-                        }
-                    }
-                }
+                return !(p instanceof Rook || p instanceof Queen || p instanceof Pawn);
             }
     
             //return false as a default
             return false;
         }
 
-        public boolean kingCanEscape(King king) {
-            System.out.println("POSSIBLE KING MOVE CHECK");
-        
+        /**
+         * Method to check if the king can escape a check.
+         * @param king The king to check.
+         * @return True if the king can escape, false otherwise.
+         */
+        public boolean kingCanEscape(King king) {        
             // Store king's current position
             Point pos = king.location;
         
@@ -648,14 +648,12 @@ public class ChessGame {
                     // If the square is empty, check for a valid move
                     if (targetPiece == null) {
                         if (king.validMove(point) && !king.illegalMove(point)) {
-                            System.out.println("Valid escape move: " + point);
                             return true; // King can escape by moving
                         }
                     } else {
                         // If the square is occupied by an enemy piece, check for a valid capture
                         if (king.isWhite != targetPiece.isWhite) {
                             if (king.validCapture(point) && !king.illegalMove(point)) {
-                                System.out.println("Valid escape capture: " + point);
                                 return true; // King can escape by capturing
                             }
                         }
@@ -663,11 +661,15 @@ public class ChessGame {
                 }
             }
         
-            System.out.println("King can't escape");
             return false; // King can't escape
         }
            
 
+        /**
+         * Method to check if the checking piece can be captured.
+         * @param king The king to check.
+         * @return True if the checking piece can be captured, false otherwise.
+         */
         public boolean checkingPieceCanBeCaptured(King king) {
             //fetch checking piece
             Piece checkingPiece = king.getCheckingPiece();
@@ -678,7 +680,6 @@ public class ChessGame {
             //check if checking piece can be captured
             for (Piece piece : alliedPieces) {
                 if (piece.validCapture(checkingPiece.location) && !piece.illegalMove(checkingPiece.location)) {
-                    System.out.println("CAN BE CAPTURES");
                     //piece can be captured
                     return true;
                 }
@@ -688,6 +689,11 @@ public class ChessGame {
             return false;
         }
 
+        /**
+         * Method to check if the check can be blocked.
+         * @param king The king to check.
+         * @return True if the check can be blocked, false otherwise.
+         */
         public boolean checkCanBeBlocked(King king) {
             //get checking piece
             Piece checkingPiece = king.getCheckingPiece();
@@ -737,10 +743,15 @@ public class ChessGame {
             return false;
         }
 
-        public static boolean pointInBoard (Point point) {
+        public static boolean pointInBoard(Point point) {
             return point.x >= 0 && point.x <= 7 && point.y >= 0 && point.y <= 7; 
         }
 
+        /**
+         * Method to get all allied pieces.
+         * @param isWhite The colour of the pieces.
+         * @return An ArrayList of allied pieces.
+         */
         public ArrayList<Piece> getAlliedPieces(boolean isWhite) {
             ArrayList<Piece> alliedPieces = new ArrayList<Piece>();
 
@@ -757,6 +768,10 @@ public class ChessGame {
             return alliedPieces;
         }
 
+        /**
+         * Method to get the king.
+         * @return The king.
+         */
         public King getKing() {
             for (Piece piece : isWhiteTurn ? whitePieces : blackPieces) {
                 if (piece instanceof King) {
@@ -767,6 +782,15 @@ public class ChessGame {
             return null;
         }
 
+        /**
+         * Method to check if a check that is on a straight line can be blocked.
+         * @param alliedPieces The allied pieces.
+         * @param checkingPiece The checking piece.
+         * @param king The king.
+         * @param deltaX The change in x.
+         * @param deltaY The change in y.
+         * @return True if the check can be blocked, false otherwise.
+         */
         public boolean canBlockStraightLine(ArrayList<Piece> alliedPieces, Piece checkingPiece, King king, int deltaX, int deltaY) {
             if (deltaX == 0) {
                 //horizontal
@@ -825,6 +849,15 @@ public class ChessGame {
             return false;
         }
 
+        /**
+         * Method to check if a check that is on a diagonal line can be blocked.
+         * @param alliedPieces The allied pieces.
+         * @param checkingPiece The checking piece.
+         * @param king The king.
+         * @param deltaX The change in x.
+         * @param deltaY The change in y.
+         * @return True if the check can be blocked, false otherwise.
+         */
         private boolean canBlockDiagonalLine(ArrayList<Piece> alliedPieces, Piece checkingPiece, King king, int deltaX, int deltaY) {
             if (checkingPiece.location.x < king.location.x) {
                 //piece is above king
@@ -900,10 +933,10 @@ public class ChessGame {
         } else {
             endLabel = new JLabel("DRAW!");
         }
-        if (isWhiteTurn){
+        if (isWhiteTurn) {
             blackscore++;
             scoreLabel.setText(whitescore + "-" + blackscore);
-        } else{
+        } else {
             whitescore++;
             scoreLabel.setText(whitescore + "-" + blackscore);
         }

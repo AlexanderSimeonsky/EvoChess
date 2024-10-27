@@ -1,9 +1,25 @@
 import java.awt.*;
-import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
+/**
+ * Rook class that extends Piece.
+ * Contains movement logic for the Rook piece.
+ * Also contains inner classes for the evolved forms of the Rook piece.
+ */
 public class Rook extends Piece {
     boolean hasMoved = false;
 
+    /**
+     * Constructor for Rook.
+     * @param isWhite colour of the piece (true if white, false if black)
+     * @param location location of the piece on the board
+     */
     Rook(boolean isWhite, Point location) {
         super(isWhite, location);
         this.points = 5;
@@ -88,26 +104,51 @@ public class Rook extends Piece {
             
             EvoRook evoRook = new EvoRook(isWhite, location);
             ChessGame.board[location.x][location.y] = evoRook;
+            String colour = "";
+            String pieceName = "";
 
             //remove it from the list of pieces and add the new one
             if (isWhite) {
                 ChessGame.whitePieces.remove(this);
                 ChessGame.whitePieces.add(evoRook);
-                return evoRook;
+                colour = "White";
+                pieceName = "evo-white-rook";
             } else {
                 ChessGame.blackPieces.remove(this);
                 ChessGame.blackPieces.add(evoRook);
-                return evoRook;
+                colour = "Black";
+                pieceName = "evo-black-rook";
             }
+
+            try {
+                JPanel temp = ChessGame.chessBoardPanel;
+                JPanel square = (JPanel) temp.getComponent(location.x * 8 + location.y);
+                square.removeAll();
+                square.putClientProperty("piece", evoRook);
+                BufferedImage img = ImageIO.read(new File("sprites/" + colour + "/" + pieceName + ".png"));
+                JLabel tutorialLabel = new JLabel(new ImageIcon(img));
+                square.add(tutorialLabel);
+                square.revalidate();
+                square.repaint();
+            } catch (IOException a) {
+                a.printStackTrace();
+            }
+
+            return evoRook;
         } 
         return null;
     }
 
     class EvoRook extends Rook {
+
+        /**
+         * Constructor for EvoRook.
+         * @param isWhite colour of the piece (true if white, false if black)
+         * @param location location of the piece on the board
+         */
         EvoRook(boolean isWhite, Point location) {
             super(isWhite, location);
             this.points = 5;
-            this.acquiredPoints = acquiredPoints;
         }
 
         @Override
