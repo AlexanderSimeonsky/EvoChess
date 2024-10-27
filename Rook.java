@@ -1,5 +1,11 @@
 import java.awt.*;
-import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  * Rook class that extends Piece.
@@ -98,17 +104,37 @@ public class Rook extends Piece {
             
             EvoRook evoRook = new EvoRook(isWhite, location);
             ChessGame.board[location.x][location.y] = evoRook;
+            String colour = "";
+            String pieceName = "";
 
             //remove it from the list of pieces and add the new one
             if (isWhite) {
                 ChessGame.whitePieces.remove(this);
                 ChessGame.whitePieces.add(evoRook);
-                return evoRook;
+                colour = "White";
+                pieceName = "evo-white-rook";
             } else {
                 ChessGame.blackPieces.remove(this);
                 ChessGame.blackPieces.add(evoRook);
-                return evoRook;
+                colour = "Black";
+                pieceName = "evo-black-rook";
             }
+
+            try {
+                JPanel temp = ChessGame.chessBoardPanel;
+                JPanel square = (JPanel) temp.getComponent(location.x * 8 + location.y);
+                square.removeAll();
+                square.putClientProperty("piece", evoRook);
+                BufferedImage img = ImageIO.read(new File("sprites/" + colour + "/" + pieceName + ".png"));
+                JLabel tutorialLabel = new JLabel(new ImageIcon(img));
+                square.add(tutorialLabel);
+                square.revalidate();
+                square.repaint();
+            } catch (IOException a) {
+                a.printStackTrace();
+            }
+
+            return evoRook;
         } 
         return null;
     }

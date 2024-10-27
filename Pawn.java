@@ -1,7 +1,12 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import javax.swing.*;
+
 
 /**
  * Pawn class that extends Piece.
@@ -313,16 +318,37 @@ public class Pawn extends Piece {
             EvoPawn evoPawn = new EvoPawn(isWhite, location);
             ChessGame.board[location.x][location.y] = evoPawn;
 
+            String colour;
+            String pieceName;
+
             //remove it from the list of pieces and add the new one
             if (isWhite) {
                 ChessGame.whitePieces.remove(this);
                 ChessGame.whitePieces.add(evoPawn);
-                return evoPawn;
+                colour = "White";
+                pieceName = "evo-white-pawn";
             } else {
                 ChessGame.blackPieces.remove(this);
                 ChessGame.blackPieces.add(evoPawn);
-                return evoPawn;
+                colour = "Black";
+                pieceName = "evo-black-pawn";
             }
+
+            try {
+                JPanel temp = ChessGame.chessBoardPanel;
+                JPanel square = (JPanel) temp.getComponent(location.x * 8 + location.y);
+                square.removeAll();
+                square.putClientProperty("piece", evoPawn);
+                BufferedImage img = ImageIO.read(new File("sprites/" + colour + "/" + pieceName + ".png"));
+                JLabel tutorialLabel = new JLabel(new ImageIcon(img));
+                square.add(tutorialLabel);
+                square.revalidate();
+                square.repaint();
+            } catch (IOException a) {
+                a.printStackTrace();
+            }
+
+            return evoPawn;
         } 
         return null;
     }
@@ -400,16 +426,37 @@ public class Pawn extends Piece {
                 SuperPawn superPawn = new SuperPawn(isWhite, location);
                 ChessGame.board[location.x][location.y] = superPawn;
 
+                String colour;
+                String pieceName;
+
                 //remove it from the list of pieces and add the new one
                 if (isWhite) {
                     ChessGame.whitePieces.remove(this);
                     ChessGame.whitePieces.add(superPawn);
-                    return superPawn;
+                    colour = "White";
+                    pieceName = "super-white-pawn";
                 } else {
                     ChessGame.blackPieces.remove(this);
                     ChessGame.blackPieces.add(superPawn);
-                    return superPawn;
+                    colour = "Black";
+                    pieceName = "super-black-pawn";
+                }   
+
+                try {
+                    JPanel temp = ChessGame.chessBoardPanel;
+                    JPanel square = (JPanel) temp.getComponent(location.x * 8 + location.y);
+                    square.removeAll();
+                    square.putClientProperty("piece", superPawn);
+                    BufferedImage img = ImageIO.read(new File("sprites/" + colour + "/" + pieceName + ".png"));
+                    JLabel tutorialLabel = new JLabel(new ImageIcon(img));
+                    square.add(tutorialLabel);
+                    square.revalidate();
+                    square.repaint();
+                } catch (IOException a) {
+                    a.printStackTrace();
                 }
+
+                return superPawn;
             } 
             return null;
         }

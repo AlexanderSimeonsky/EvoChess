@@ -29,6 +29,7 @@ public class ChessGame {
     public static ArrayList<Piece> blackPieces;
     public int blackscore;
     public int whitescore;
+    JLabel tutorialLabel;
 
     /**
      * Constructor that begins the game flow.
@@ -253,6 +254,10 @@ public class ChessGame {
     public class ChessMouseListener extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
+            if (tutorialLabel != null) {
+                frame.remove(tutorialLabel);
+            }
+            
             if (!gameIsOver) {
                 JPanel clickedSquare = (JPanel) e.getSource();
     
@@ -484,8 +489,9 @@ public class ChessGame {
             }
 
             if (tutorialImage != null) {
-                JLabel tutorialLabel = new JLabel(new ImageIcon(tutorialImage));
-                tutorialLabel.setBounds(1000, 300, 550, 550);
+                JLabel tutorial = new JLabel(new ImageIcon(tutorialImage));
+                tutorial.setBounds(1000, 300, 550, 550);
+                tutorialLabel = tutorial;
                 frame.add(tutorialLabel);
                 frame.revalidate();
                 frame.repaint();

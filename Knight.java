@@ -1,4 +1,11 @@
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  * Knight class that extends Piece.
@@ -93,17 +100,37 @@ public class Knight extends Piece {
             //create the evolved piece
             EvoKnight evoKnight = new EvoKnight(isWhite, location);
             ChessGame.board[location.x][location.y] = evoKnight;
+            String colour;
+            String pieceName;
 
             //remove it from the list of pieces and add the new one
             if (isWhite) {
                 ChessGame.whitePieces.remove(this);
                 ChessGame.whitePieces.add(evoKnight);
-                return evoKnight;
+                colour = "White";
+                pieceName = "evo-white-knight";
             } else {
                 ChessGame.blackPieces.remove(this);
                 ChessGame.blackPieces.add(evoKnight);
-                return evoKnight;
+                colour = "Black";
+                pieceName = "evo-black-knight";
             }
+
+            try {
+                JPanel temp = ChessGame.chessBoardPanel;
+                JPanel square = (JPanel) temp.getComponent(location.x * 8 + location.y);
+                square.removeAll();
+                square.putClientProperty("piece", evoKnight);
+                BufferedImage img = ImageIO.read(new File("sprites/" + colour + "/" + pieceName + ".png"));
+                JLabel tutorialLabel = new JLabel(new ImageIcon(img));
+                square.add(tutorialLabel);
+                square.revalidate();
+                square.repaint();
+            } catch (IOException a) {
+                a.printStackTrace();
+            }
+
+            return evoKnight;
         } 
         return null;
     }
@@ -159,16 +186,37 @@ public class Knight extends Piece {
                 ChessGame.board[location.x][location.y] = superKnight;
                 SoundPlayer.playSound("sounds/evolve.wav");
 
+                String colour;
+                String pieceName;
+
                 //remove it from the list of pieces and add the new one
                 if (isWhite) {
                     ChessGame.whitePieces.remove(this);
                     ChessGame.whitePieces.add(superKnight);
-                    return superKnight;
+                    colour = "White";
+                    pieceName = "super-white-knight";
                 } else {
                     ChessGame.blackPieces.remove(this);
                     ChessGame.blackPieces.add(superKnight);
-                    return superKnight;
+                    colour = "Black";
+                    pieceName = "super-black-knight";
                 }
+
+                try {
+                    JPanel temp = ChessGame.chessBoardPanel;
+                    JPanel square = (JPanel) temp.getComponent(location.x * 8 + location.y);
+                    square.removeAll();
+                    square.putClientProperty("piece", superKnight);
+                    BufferedImage img = ImageIO.read(new File("sprites/" + colour + "/" + pieceName + ".png"));
+                    JLabel tutorialLabel = new JLabel(new ImageIcon(img));
+                    square.add(tutorialLabel);
+                    square.revalidate();
+                    square.repaint();
+                } catch (IOException a) {
+                    a.printStackTrace();
+                }
+
+                return superKnight;
             } 
             return null;
         }

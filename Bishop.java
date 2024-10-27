@@ -1,4 +1,8 @@
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -97,17 +101,37 @@ public class Bishop extends Piece {
             //create the evolved piece
             EvoBishop evoBishop = new EvoBishop(isWhite, location);
             ChessGame.board[location.x][location.y] = evoBishop;
+            String colour;
+            String pieceName;
 
             //remove it from the list of pieces and add the new one
             if (isWhite) {
                 ChessGame.whitePieces.remove(this);
                 ChessGame.whitePieces.add(evoBishop);
-                return evoBishop;
+                colour = "White";
+                pieceName = "evo-white-bishop";
             } else {
                 ChessGame.blackPieces.remove(this);
                 ChessGame.blackPieces.add(evoBishop);
-                return evoBishop;
+                colour = "Black";
+                pieceName = "evo-black-bishop";
             }
+
+            try {
+                JPanel temp = ChessGame.chessBoardPanel;
+                JPanel square = (JPanel) temp.getComponent(location.x * 8 + location.y);
+                square.removeAll();
+                square.putClientProperty("piece", evoBishop);
+                BufferedImage img = ImageIO.read(new File("sprites/" + colour + "/" + pieceName + ".png"));
+                JLabel tutorialLabel = new JLabel(new ImageIcon(img));
+                square.add(tutorialLabel);
+                square.revalidate();
+                square.repaint();
+            } catch (IOException a) {
+                a.printStackTrace();
+            }
+
+            return evoBishop;
         } 
         return null;
     }

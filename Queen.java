@@ -1,5 +1,12 @@
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  * Queen class that extends Piece.
@@ -107,17 +114,37 @@ public class Queen extends Piece {
             //create the evolved piece
             EvoQueen evoQueen = new EvoQueen(isWhite, location);
             ChessGame.board[location.x][location.y] = evoQueen;
+            String pieceName = "";
+            String colour = "";
 
             //remove it from the list of pieces and add the new one
             if (isWhite) {
                 ChessGame.whitePieces.remove(this);
                 ChessGame.whitePieces.add(evoQueen);
-                return evoQueen;
+                colour = "White";
+                pieceName = "evo-white-queen";
             } else {
                 ChessGame.blackPieces.remove(this);
                 ChessGame.blackPieces.add(evoQueen);
-                return evoQueen;
+                colour = "Black";
+                pieceName = "evo-black-queen";
             }
+
+            try {
+                JPanel temp = ChessGame.chessBoardPanel;
+                JPanel square = (JPanel) temp.getComponent(location.x * 8 + location.y);
+                square.removeAll();
+                square.putClientProperty("piece", evoQueen);
+                BufferedImage img = ImageIO.read(new File("sprites/" + colour + "/" + pieceName + ".png"));
+                JLabel tutorialLabel = new JLabel(new ImageIcon(img));
+                square.add(tutorialLabel);
+                square.revalidate();
+                square.repaint();
+            } catch (IOException a) {
+                a.printStackTrace();
+            }
+
+            return evoQueen;
         } 
         return null;
     }
@@ -182,17 +209,37 @@ public class Queen extends Piece {
                 //create the evolved piece
                 SuperQueen superQueen = new SuperQueen(isWhite, location);
                 ChessGame.board[location.x][location.y] = superQueen;
+                String colour = "";
+                String pieceName = "";
 
                 //remove it from the list of pieces and add the new one
                 if (isWhite) {
                     ChessGame.whitePieces.remove(this);
                     ChessGame.whitePieces.add(superQueen);
-                    return superQueen;
+                    colour = "White";
+                    pieceName = "super-white-queen";
                 } else {
                     ChessGame.blackPieces.remove(this);
                     ChessGame.blackPieces.add(superQueen);
-                    return superQueen;
+                    colour = "Black";
+                    pieceName = "super-black-queen";
                 }
+
+                try {
+                    JPanel temp = ChessGame.chessBoardPanel;
+                    JPanel square = (JPanel) temp.getComponent(location.x * 8 + location.y);
+                    square.removeAll();
+                    square.putClientProperty("piece", superQueen);
+                    BufferedImage img = ImageIO.read(new File("sprites/" + colour + "/" + pieceName + ".png"));
+                    JLabel tutorialLabel = new JLabel(new ImageIcon(img));
+                    square.add(tutorialLabel);
+                    square.revalidate();
+                    square.repaint();
+                } catch (IOException a) {
+                    a.printStackTrace();
+                }
+    
+                return superQueen;
             } 
             return null;
         }
