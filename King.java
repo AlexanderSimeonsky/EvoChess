@@ -177,7 +177,9 @@ public class King extends Piece{
                 break;
             }
         }
-
+        if(check){
+            SoundPlayer.playSound("sounds/Check.wav");
+        }
         return check;
     }
 

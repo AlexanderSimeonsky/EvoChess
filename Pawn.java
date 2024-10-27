@@ -321,6 +321,7 @@ public class Pawn extends Piece {
     public Piece pieceEvolves() {
         //check if evolution criteria is met
         if (acquiredPoints >= 1) {
+            SoundPlayer.playSound("sounds/evolve.wav");
             //create the evolved piece
             EvoPawn evoPawn = new EvoPawn(isWhite, location);
             ChessGame.board[location.x][location.y] = evoPawn;
@@ -400,6 +401,7 @@ public class Pawn extends Piece {
 
         @Override
         public Piece pieceEvolves() {
+            SoundPlayer.playSound("sounds/evolve.wav");
             //check if evolution criteria is met
             if (acquiredPoints >= 1) {
                 //create the evolved piece

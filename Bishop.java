@@ -86,6 +86,8 @@ public class Bishop extends Piece {
     @Override
     public Piece pieceEvolves() {
         if (acquiredPoints >= 2) {
+
+            SoundPlayer.playSound("sounds/evolve.wav");
             //create the evolved piece
             EvoBishop evoBishop = new EvoBishop(isWhite, location);
             ChessGame.board[location.x][location.y] = evoBishop;
@@ -146,6 +148,7 @@ public class Bishop extends Piece {
 
         @Override
         public Piece pieceEvolves() {
+            SoundPlayer.playSound("sounds/evolve.wav");
             if (acquiredPoints >= 4) {
                 //create the evolved piece
                 Queen queen = new Queen(isWhite, location);
