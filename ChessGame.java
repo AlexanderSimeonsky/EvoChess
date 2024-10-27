@@ -3,6 +3,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
+import java.io.IOException;
 
 /**
  * Class to handle the game flow.
@@ -37,75 +41,131 @@ public class ChessGame {
         blackPieces = new ArrayList<Piece>(16);
         renderChessboard();
         renderPieces();
+
+    
+    }
+
+    public static void activateChessMenu(JFrame frame) {
+
+        SoundPlayer.playSound("sounds/close.wav");
+        
+
+        new ChessMenu().createMenu();  
+    
+        // Set up a timer to dispose of the menu frame after 0.5 seconds
+        Timer timer = new Timer(500, event -> frame.dispose());
+        timer.setRepeats(false);
+        timer.start();
     }
 
     private void renderChessboard() {
-        Color brown = new Color(149, 69, 53);
         Color black = new Color(50, 50, 50);
         Color white = new Color(200, 200, 200);
-
+        
         frame = new JFrame();
         frame.setUndecorated(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().setBackground(brown);
-
+    
+        // Load the background image and make it final
+        final Image backgroundImage;
+        try {
+            backgroundImage = ImageIO.read(new File("sprites/GameBackground.jpg"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error: Background image not found.");
+            return; // Exit the method if the image can't be loaded
+        }
+    
+        // Custom JPanel for background image
+        JPanel backgroundPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (backgroundImage != null) {
+                    g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+                }
+            }
+        };
+        backgroundPanel.setLayout(null);
+        frame.setContentPane(backgroundPanel);
+    
+        // Set fullscreen mode
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         gd.setFullScreenWindow(frame);
-        frame.setLayout(null);
-
+    
+        // Create and configure the chessboard panel
         chessBoardPanel = new JPanel();
         chessBoardPanel.setLayout(new GridLayout(8, 8));
-
+        chessBoardPanel.setOpaque(false); // Make chessboard panel transparent
+    
         boolean isWhite = true;
-
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 JPanel panel = new JPanel();
                 panel.setLayout(new BorderLayout());
                 panel.setBackground(isWhite ? white : black);
                 panel.addMouseListener(new ChessMouseListener());
-
                 chessBoardPanel.add(panel);
                 isWhite = !isWhite;
             }
             isWhite = !isWhite;
         }
-
+    
         chessBoardPanel.setBounds(50, 50, 600, 600);
-        frame.add(chessBoardPanel);
-
-        JButton restartButton = new JButton("Restart");
-        restartButton.setBounds(frame.getWidth() - 100, 60, 80, 30);
-        frame.add(restartButton);
-
-        restartButton.addActionListener(e -> resetGame());
-
-        JButton exitButton = new JButton("Exit");
-        exitButton.setBounds(frame.getWidth() - 100, 100, 80, 30);
-        frame.add(exitButton);
-
-        exitButton.addActionListener(e -> System.exit(0));
-
+        backgroundPanel.add(chessBoardPanel);
+    
+        //space
+    
+        // Resize components based on window resizing
         frame.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
                 int screenWidth = frame.getWidth();
                 int screenHeight = frame.getHeight();
                 int newSize = Math.min(screenWidth, screenHeight) - 100;
-                chessBoardPanel.setBounds((screenWidth - newSize) / 2, (screenHeight - newSize) / 2, newSize, newSize);
-                restartButton.setBounds(screenWidth - 100, screenHeight - 70, 80, 30);
-                exitButton.setBounds(screenWidth - 100, screenHeight - 40, 80, 30);
+                chessBoardPanel.setBounds((screenWidth - newSize) - 1325 / 2, (screenHeight - newSize) / 2, newSize, newSize);
+                
+                
             }
         });
-
+    
+        // Turn label
         turnLabel = new JLabel(isWhiteTurn ? "White's turn" : "Black's turn");
         turnLabel.setForeground(isWhiteTurn ? white : black);
-        turnLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        turnLabel.setBounds(50, 50, 250, 100);
+        turnLabel.setFont(new Font("calibri", Font.BOLD, 20));
+        turnLabel.setBounds(1220, 70, 250, 100);
         turnLabel.setBackground(white);
-        frame.add(turnLabel);
+        backgroundPanel.add(turnLabel);
 
+        try {
+            BufferedImage buttonImage = ImageIO.read(new File("sprites/MainMenubuttons.png"));
+            JButton backToMenuButton = new JButton(new ImageIcon(buttonImage));
+            backToMenuButton.setBounds(1100, 770, buttonImage.getWidth(), buttonImage.getHeight());
+            backToMenuButton.setBorderPainted(false);
+            backToMenuButton.setContentAreaFilled(false);
+            backToMenuButton.setFocusPainted(false);
+            backToMenuButton.addActionListener(e -> activateChessMenu(frame));
+            backgroundPanel.add(backToMenuButton);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error: Button image not found.");
+        }
 
+        try {
+            BufferedImage buttonIcon = ImageIO.read(new File("sprites/MainMenubuttons.png"));
+            JButton newGameButton = new JButton(new ImageIcon(buttonIcon));
+            newGameButton.setBounds(1100, 10, buttonIcon.getWidth(), buttonIcon.getHeight());
+            newGameButton.setBorderPainted(false);
+            newGameButton.setContentAreaFilled(false);
+            newGameButton.setFocusPainted(false);
+            newGameButton.addActionListener(e -> resetGame());
+            backgroundPanel.add(newGameButton);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    
+        // Trigger initial layout
         frame.dispatchEvent(new java.awt.event.ComponentEvent(frame, java.awt.event.ComponentEvent.COMPONENT_RESIZED));
         frame.setVisible(true);
     }
@@ -165,12 +225,18 @@ public class ChessGame {
     }
 
     private void resetGame() {
-        for (Component square : chessBoardPanel.getComponents()) {
-            ((JPanel) square).removeAll();
-
-            board = new Piece[8][8];
-            renderPieces();
-        }
+        board = new Piece[8][8];
+        turnCounter = 0;
+        isWhiteTurn = true;
+        previousSquare = null;
+        selectedPiece = null;
+        gameIsOver = false;
+        whitePieces = new ArrayList<Piece>(16);
+        blackPieces = new ArrayList<Piece>(16);
+        renderChessboard();
+        renderPieces();
+        
+        
     }
 
     public class ChessMouseListener extends MouseAdapter {
@@ -226,6 +292,7 @@ public class ChessGame {
                                     } else {
                                         blackPieces.remove(p);
                                     }
+                                    SoundPlayer.playSound("sounds/capture.wav");
     
                                     //move to new square
                                     clickedSquare.add(previousSquare.getComponent(0));
@@ -278,6 +345,7 @@ public class ChessGame {
                                 }
                             } else {
                                 //if it is the same colour then deselect the pieces
+                                
                                 System.out.println("invalid move");
                                 previousSquare = null;
                                 selectedPiece = null;
@@ -297,6 +365,11 @@ public class ChessGame {
                                 clickedSquare.putClientProperty("piece", selectedPiece);
                                 board[targetRow][targetCol] = selectedPiece;
                                 selectedPiece.move(new Point(targetRow, targetCol));
+                                if (isWhiteTurn){
+                                    SoundPlayer.playSound("sounds/whiteMove.wav");
+                                } else {
+                                    SoundPlayer.playSound("sounds/blackMove.wav");
+                                }
 
                                 //if king moved update variable for king location
                                 if (selectedPiece instanceof King) {
@@ -342,6 +415,7 @@ public class ChessGame {
     
                             } else {
                                 //if it is not valid then deselect it and the square
+                                SoundPlayer.playSound("sounds/illegal.wav");
                                 System.out.println("move invalid");
                                 previousSquare = null;
                                 selectedPiece = null;
@@ -356,6 +430,7 @@ public class ChessGame {
                     if ((Piece) clickedSquare.getClientProperty("piece") != null) {
                         selectedPiece = (Piece) clickedSquare.getClientProperty("piece");
                         previousSquare = clickedSquare;
+                        System.out.println(selectedPiece);
     
                         //check whos turn it is
                         if (isWhiteTurn && !selectedPiece.isWhite) {
@@ -364,6 +439,11 @@ public class ChessGame {
                         } else if (!isWhiteTurn && selectedPiece.isWhite) {
                             selectedPiece = null;
                             previousSquare = null;
+                        } else {
+                            
+                                
+
+                            
                         }
 
                         System.out.println("piece selected");
@@ -417,7 +497,8 @@ public class ChessGame {
                 System.out.println("king not in check");
                 return false;
             }
-
+            
+            SoundPlayer.playSound("sounds/close.wav");
             return true;
         }
 
@@ -482,6 +563,7 @@ public class ChessGame {
     
             //no piece can move so stalemate
             System.out.println("No piece can move");
+            SoundPlayer.playSound("sounds/close.wav");
             return true;
         }
     
@@ -803,8 +885,8 @@ public class ChessGame {
         }
 
         endLabel.setForeground(isWhiteTurn ? Color.BLACK : Color.WHITE);
-        endLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        endLabel.setBounds(50, 200, 250, 100);
+        endLabel.setFont(new Font("Calibri", Font.BOLD, 20));
+        endLabel.setBounds(1160, 100, 250, 100);
         endLabel.setBackground(Color.WHITE);
         frame.add(endLabel);
 

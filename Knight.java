@@ -148,6 +148,7 @@ public class Knight extends Piece{
                 //create the evolved piece
                 SuperKnight superKnight = new SuperKnight(isWhite, location);
                 ChessGame.board[location.x][location.y] = superKnight;
+                SoundPlayer.playSound("sounds/evolve.wav");
 
                 //remove it from the list of pieces and add the new one
                 if (isWhite) {

@@ -84,6 +84,8 @@ public class Rook extends Piece {
     public Piece pieceEvolves() {
         if (acquiredPoints >= 2) {
             //create the evolved piece
+            SoundPlayer.playSound("sounds/evolve.wav");
+            
             EvoRook evoRook = new EvoRook(isWhite, location);
             ChessGame.board[location.x][location.y] = evoRook;
 
@@ -143,6 +145,9 @@ public class Rook extends Piece {
 
         @Override
         public Piece pieceEvolves() {
+
+            SoundPlayer.playSound("sounds/evolve.wav");
+
             if (acquiredPoints >= 4) {
                 //create the evolved piece
                 Queen queen = new Queen(isWhite, location);
